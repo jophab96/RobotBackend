@@ -7,7 +7,8 @@ var mongoose = require ('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var methodsRouter = require('./routes/saveWorkflow');
+var saveWorkflowRouter = require('./routes/saveWorkflow');
+var playWorkflowRouter = require('./routes/playWorkflow');
 
 
 var app = express();
@@ -24,7 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/saveWorkflow', methodsRouter);
+app.use('/saveWorkflow', saveWorkflowRouter);
+app.use('/playWorkflow', playWorkflowRouter);
+
 
 //MONGOOSE
 mongoose.connect('mongodb://localhost/mongo');

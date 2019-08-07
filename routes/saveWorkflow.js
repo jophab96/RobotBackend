@@ -1,3 +1,4 @@
+
 var express = require('express');
 var router = express.Router();
 var mongoose = require ('mongoose');
@@ -31,15 +32,16 @@ function createWorkflow(created_at){
 function createGripperGripJob(activationTimeout){
 
   const gripper_grip = new GRIPPER_GRIP({
-    _id_job: new mongoose.Types.ObjectId(),
+    _id: new mongoose.Types.ObjectId(),
     activationTimeout : activationTimeout
 });
 
-  workflow.jobs.push({id_job_fk: gripper_grip._id_job,name: 'GRIPPER_GRIP'})
+  workflow.jobs.push({_id_job_fk: gripper_grip._id,name: 'GRIPPER_GRIP'})
 
   gripper_grip.save().then(result =>{
+    console.log('New GRIPPER JOB');
     console.log(result);
-    return result._id_job;
+    return result._id;
   } );
 
 }
@@ -49,28 +51,37 @@ function createGripperGripJob(activationTimeout){
 router.post('/', function(req, res, next) {
 
 
+  let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
-  //JSON Input des Workflow Objects
-  //Iteriere über Jobs und zerlege diese
+  createWorkflow(inputWorkflow.created_at);
 
-  //JSON.getDate
-  createWorkflow(Date.now());
+  for (let job of inputWorkflow.job) {
 
-  createGripperGripJob(5);
-  createGripperGripJob(5);
+    console.log('Working on: ' + job.name);
+
+    switch(job.name) {
+      case 'trigger_gripper_grip': {
+        createGripperGripJob(5);
+        break;
+      }
+      case 'trigger_move_base': {
+        //statements;
+        break;
+      }
+      default: {
+        //statements;
+        break;
+      }
+    }
+
+  }
 
   saveWorkflow();
 
-  res.send('Saved to the BD');
 
 
-  /**
-  worfklow.save().then(result =>{
-    console.log(result);
-    res.send('Saved to the BD'+ result);
+  res.send('OK');
 
-  }).catch(err=>console.log(err));
-**/
 
   });
 
@@ -85,10 +96,6 @@ router.get('/', function(req, res, next) {
       .catch();
 
 });
-
-
-
-
 
 
 module.exports = router;
