@@ -1,21 +1,35 @@
-var mongoose = require ('mongoose');
+var mongoose = require('mongoose');
+const { Model, Schema } = mongoose;
+var request = require('request');
 
-var Schema = mongoose.Schema;
+
+
 
 var workflowSchema = new Schema({
     _id: mongoose.Types.ObjectId,
     created_at: Date,
-   //jobs : [String]
+    //jobs : [String]
 
     jobs: [{
         _id_job_fk: mongoose.Types.ObjectId,
-        name:String
+        name: String
     }],
 
 });
 
+class WorkFlow extends Model {
 
-//Zuerst Job Array, dannn Worfklow
 
 
-module.exports = mongoose.model('Workflow',workflowSchema);
+
+
+    saySomething(text) {
+
+        console.log(text);
+    }
+
+
+}
+
+
+module.exports = mongoose.model(WorkFlow, workflowSchema, 'workflow');

@@ -1,6 +1,8 @@
 var mongoose = require ('mongoose');
 
-var Schema = mongoose.Schema;
+const { Model, Schema } = mongoose;
+var request = require('request');
+
 const JOBNAME = 'trigger_gripper_grip';
 
 var GRIPPER_GRIP_SCHEMA = new Schema({
@@ -9,12 +11,12 @@ var GRIPPER_GRIP_SCHEMA = new Schema({
 });
 
 
-function runOnMachine(){
+class Job_Gripper_Grip extends Model {
 
 
 }
 
-//Zuerst Job Array, dannn Worfklow
 
 
-module.exports = mongoose.model('GRIPPER_GRIP',GRIPPER_GRIP_SCHEMA);
+
+module.exports = mongoose.model(Job_Gripper_Grip, GRIPPER_GRIP_SCHEMA, 'job_gripper_grip');
