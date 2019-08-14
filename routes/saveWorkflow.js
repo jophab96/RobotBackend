@@ -73,20 +73,25 @@ function createGripperReleaseJob(activationTimeout) {
 /* POST methods listing. */
 router.post('/', function (req, res, next) {
 
+    console.log(req.body.jsondata);
 
-    let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
+    //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
-    createWorkflow(inputWorkflow.created_at);
+    let inputWorkflow = req.body.jsondata;
 
-    for (let job of inputWorkflow.job) {
+    console.log(inputWorkflow);
 
-        console.log('Working on: ' + job.name);
+    createWorkflow(inputWorkflow._created_at);
 
-        switch (job.name) {
-            case ('trigger_gripper_grip'):
+    for (let job of inputWorkflow._jobsObjects) {
+
+        console.log('Working on: ' + job._name);
+
+        switch (job._name) {
+            case ( 'GripperGrip'):
                 createGripperGripJob(10);
                 break;
-            case ('trigger_gripper_release'):
+            case ('GripperRelease'):
                 createGripperReleaseJob(10);
                 break;
             default:

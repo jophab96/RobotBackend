@@ -47,10 +47,6 @@ async function doPostRequest() {
 }
 
 
-
-
-
-
 const sendToServer = async url => {
 
     var config = {
@@ -118,10 +114,6 @@ const checkJobState = async job_id => {
 };
 
 
-
-
-
-
 async function doGripperGrip(job) {
 
     GRIPPER_GRIP.findById(job._id_job_fk)
@@ -174,7 +166,7 @@ async function playWorkflow(workflow) {
                 console.log("START");
                 await doGripperGrip(job);
                 a_job =  await sendToServer();
-                 await checkJobState(a_job);
+                await checkJobState(a_job);
                 console.log("END");
                 break;
             case ('trigger_gripper_release'):
