@@ -32,6 +32,7 @@ function createWorkflow(created_at) {
         created_at: created_at,
     });
 
+    return workflow._id;
 
 }
 
@@ -81,7 +82,7 @@ router.post('/', function (req, res, next) {
 
     console.log(inputWorkflow);
 
-    createWorkflow(inputWorkflow._created_at);
+    var wf_id = createWorkflow(inputWorkflow._created_at);
 
     for (let job of inputWorkflow._jobsObjects) {
 
@@ -104,7 +105,7 @@ router.post('/', function (req, res, next) {
     saveWorkflow();
 
 
-    res.send('OK');
+    res.send(wf_id);
 
 
 });
