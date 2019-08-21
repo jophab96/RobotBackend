@@ -24,69 +24,6 @@ const Job_GripperRelease = require('../models/IJob');
 
 
 
-
-const sendToServer = async jsonData => {
-
-    try {
-
-        console.log('JSON DATA TO SEND');
-        console.log(jsonData);
-
-        const response = await axios.post(URL, jsonData, RPC_HEADER);
-        return response.data.result.job_id;
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-const checkJobState = async jobID => {
-
-    var jsonDataObj = {
-        'jsonrpc': '2.0',
-        'id': '1',
-        'method': 'get_workflow_progress',
-        'params': [{'job_id': jobID}]
-    };
-
-    try {
-
-        var response = await axios.post(URL, jsonDataObj, RPC_HEADER);
-
-        while (response.data.result.job_state == 'active') {
-
-            console.log('WAITING, ');
-            console.log(response.data);
-
-            await sleep(SLEEP_INTERVALL);
-            response = await axios.post(URL, jsonDataObj, RPC_HEADER);
-        }
-        const data = response.data;
-        console.log(data);
-        return response.data.result;
-
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-async function playWorkflow(workflow) {
-
-    for (let job of workflow.jobs) {
-
-        var activeJobID;
-        var jsonData;
-
-        jsonData = await findJob(job);
-        activeJobID = await sendToServer(jsonData);
-        await checkJobState(activeJobID);
-    }
-
-
-}
-
-
 function findOneWorkflow(id) {
 
     return Workflow.findById(id)
@@ -120,10 +57,6 @@ function findOneJob(id){
         });
 
 };
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 
 /* POST methods listing. */
