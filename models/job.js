@@ -1,21 +1,12 @@
-var mongoose = require ('mongoose');
 
-class Job extends mongoose.Schema {
+class Job {
+
     constructor() {
-        const job = super({
-            _id: mongoose.Types.ObjectId,
-            name: String
-        });
 
-       // Work.helloWorld = this.helloWorld();
-        job.methods.getCustomerTypes = this.getCustomerTypes;
-
-
-        return job;
     }
 
-    helloWorld() {
-        console.log("Hello World");
+     helloWorld() {
+        console.log("Hello from SuperClass");
     }
 
     byeWorld() {
@@ -25,4 +16,4 @@ class Job extends mongoose.Schema {
 
 }
 
-module.exports = mongoose.model('JOB',new Job);
+module.exports = Job;

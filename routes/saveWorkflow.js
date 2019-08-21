@@ -10,9 +10,8 @@ const GRIPPER_RELEASE = require('../models/job_gripper_release');
 const Job = require('../models/job');
 const Work = require('../models/work')
 
-var job;
 var workflow;
-var work;
+var job;
 
 
 function saveWorkflow() {
@@ -43,7 +42,7 @@ function createGripperGripJob(activationTimeout) {
         activationTimeout: activationTimeout
     });
 
-    workflow.jobs.push({_id_job_fk: gripper_grip._id, name: 'trigger_gripper_grip'})
+    workflow.jobs.push({_id_job_fk: gripper_grip._id, name: 'trigger_gripper_grip'});
 
     gripper_grip.save().then(result => {
         console.log('New GRIPPER JOB');
@@ -87,6 +86,7 @@ router.post('/', function (req, res, next) {
     for (let job of inputWorkflow._jobsObjects) {
 
         console.log('Working on: ' + job._name);
+
 
         switch (job._name) {
             case ( 'GripperGrip'):

@@ -86,27 +86,8 @@ async function playWorkflow(workflow) {
 
 }
 
-function findJob(job) {
 
-    return IJob.findById(job._id_job_fk)
-        .exec()
-        .then(specJob => {
-
-            console.log('FIND' + specJob);
-
-            var preparedRequest = {
-                'jsonrpc': '2.0',
-                'id': '1',
-                'method': specJob.rpc_name,
-                'params': [{'activation_timeout': specJob.activationTimeout}]
-            };
-
-            return preparedRequest;
-
-        });
-}
-
-function findWorkflow(id) {
+function findOneWorkflow(id) {
 
     return Workflow.findById(id)
         .exec()
@@ -119,20 +100,61 @@ function findWorkflow(id) {
 
 }
 
+function findAllWorkflows() {
+
+    return Workflow.find()
+        .exec()
+        .then(workflows => {
+            return workflows;
+        })
+        .catch();
+}
+
+function findOneJob(id){
+
+    console.log('IUD:' + id);
+    return IJob.findById(id)
+        .exec()
+        .then(specJob => {
+            return specJob;
+        });
+
+};
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
 /* POST methods listing. */
-router.post('/', async function (req, res, next) {
+// URL : /readWorkflow/readOne
+// Input: wf_id
 
-    var workflow = await findWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
-    playWorkflow(workflow);
-    res.send('OK');
+router.post('/readOne', async function (req, res, next) {
+
+    var workflow = await findOneWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
+    res.send(workflow);
 
 
 });
+
+router.post('/readAll', async function (req, res, next) {
+
+    var workflows = await findAllWorkflows();
+    res.send(workflows);
+
+
+});
+
+router.post('/readOneJob', async function (req, res, next) {
+
+    var workflows = await findOneJob(mongoose.Types.ObjectId(req.body.job_id));
+    res.send(workflows);
+
+
+});
+
+
 
 /* GET workflow listing. */
 router.get('/', function (req, res, next) {

@@ -12,7 +12,7 @@ var workflowSchema = new Schema({
 
     jobs: [{
         _id_job_fk: mongoose.Types.ObjectId,
-        name: String
+        job_type: String
     }],
 
 });
