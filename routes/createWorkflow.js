@@ -32,7 +32,7 @@ function prepareJobs(inputJobs) {
                 processingJob = new Job_GripperGrip({
                     _id: new mongoose.Types.ObjectId(),
                     job_type: GRIPPER_GRIP_NAME,
-                    activationTimeout: 11,
+                    activationTimeout: job._activationTimeout,
                     rpc_name: GRIPPER_GRIP_RPC_NAME
                 });
                 break;
@@ -40,7 +40,7 @@ function prepareJobs(inputJobs) {
                 processingJob = new Job_GripperRelease({
                     _id: new mongoose.Types.ObjectId(),
                     job_type: GRIPPER_RELEASE_NAME,
-                    activationTimeout: 14,
+                    activationTimeout: job._activationTimeout,
                     rpc_name: GRIPPER_RELEASE_RPC_NAME
 
                 });
@@ -186,6 +186,8 @@ router.post('/', function (req, res, next) {
     //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
     let inputWorkflow = req.body.jsondata;
+
+    console.log(inputWorkflow);
 
     var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
 
