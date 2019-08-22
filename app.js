@@ -10,6 +10,7 @@ var saveWorkflowRouter = require('./routes/saveWorkflow');
 var playWorkflowRouter = require('./routes/playWorkflow');
 var createWorkflowRouter = require('./routes/createWorkflow');
 var readWorkflowRouter = require('./routes/readWorkflow');
+var RobotDataServiceRouter = require('./routes/RobotDataService');
 
 
 
@@ -30,6 +31,8 @@ app.use('/saveWorkflow', saveWorkflowRouter);
 app.use('/playWorkflow', playWorkflowRouter);
 app.use('/createWorkflow', createWorkflowRouter);
 app.use('/readWorkflow', readWorkflowRouter);
+app.use('/RobotDataService', RobotDataServiceRouter);
+
 
 
 
