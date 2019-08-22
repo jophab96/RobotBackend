@@ -106,6 +106,10 @@ router.post('/', function (req, res, next) {
 
     let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
+    deletWorkflow();
+
+    createWorkflow();
+
     // let inputWorkflow = req.body.jsondata;
 
     var processingWorkflowID = createWorkflow(inputWorkflow._created_at);

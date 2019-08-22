@@ -101,6 +101,85 @@ function createWorkflow(created_at) {
 
 }
 
+function deleteJobs(workflow) {
+
+    for (let job of workflow.jobs) {
+
+        IJob.deleteMany({ _id: job._id_job_fk }, function(err) {
+            if (!err) {
+                console.log("Success")
+            }
+            else {
+                console.log("Error")
+            }
+        });
+
+    }
+}
+
+
+function findWorkflow(workflowID) {
+
+    return Workflow.findById(workflowID)
+        .exec()
+        .then(workflow => {
+            console.log(workflow);
+            return workflow;
+        })
+        .catch();
+
+}
+
+function deleteWorkflow(workflowID){
+
+    Workflow.remove({ _id: workflowID }, function(err) {
+        if (!err) {
+            console.log("Success")
+        }
+        else {
+            console.log("Error")
+        }
+    });
+
+};
+
+function deleteJob(jobID) {
+
+
+
+        IJob.remove({ _id: jobID}, function(err) {
+            if (!err) {
+                console.log("Success")
+            }
+            else {
+                console.log("Error")
+            }
+        });
+
+        Workflow.jobs.remove({ _id_job_fk: jobID}, function(err) {
+            if (!err) {
+                console.log("Success")
+            }
+            else {
+                console.log("Error")
+            }
+        });
+}
+
+
+function findJob(jobID){
+
+    return IJob.findById(jobID)
+        .exec()
+        .then(job => {
+            console.log(job);
+            return job;
+        })
+        .catch();
+
+
+}
+
 /* POST methods listing. */
 router.post('/', function (req, res, next) {
 
@@ -118,6 +197,54 @@ router.post('/', function (req, res, next) {
 
 
 });
+
+router.post('/updateWorkflow', async function (req, res, next) {
+
+    let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
+
+    // let inputWorkflow = req.body.jsondata;
+
+    //GRAB ACTUAL WORKFLOW FROM DB
+    var workflow = await findWorkflow(inputWorkflow._id);
+
+    //Delete all WF Jobs from DB
+
+    console.log(workflow);
+    await deleteJobs(workflow);
+
+    //Delete WF from DB
+    await deleteWorkflow(workflow._id);
+
+    //create WF
+
+    var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
+
+    //Push Jobs into WF
+    prepareJobs(inputWorkflow._jobsObjects);
+
+    //Save WF
+    saveWorkflow();
+
+    res.send(processingWorkflowID);
+
+
+});
+
+router.post('/deleteAll', async function (req, res, next) {
+
+    Workflow.remove({}, function(err) {
+        console.log('collection removed')
+    });
+
+    IJob.remove({}, function(err) {
+        console.log('collection removed')
+    });
+
+});
+
+
+
+
 
 /* GET workflow listing. */
 router.get('/', function (req, res, next) {
