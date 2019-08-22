@@ -89,7 +89,7 @@ function createWorkflow(created_at) {
 
 }
 
- function printAllWorkflows(){
+function printAllWorkflows(){
 
   Workflow.find()
         .exec()
@@ -183,9 +183,9 @@ function findJob(jobID){
 /* POST methods listing. */
 router.post('/', function (req, res, next) {
 
-    let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
+    //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
-    // let inputWorkflow = req.body.jsondata;
+    let inputWorkflow = req.body.jsondata;
 
     var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
 

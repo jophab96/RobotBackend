@@ -88,11 +88,13 @@ async function playWorkflow(workflow) {
 
 function findJob(job) {
 
+    console.log(job._id_job_fk);
     return IJob.findById(job._id_job_fk)
         .exec()
         .then(specJob => {
 
             console.log('FIND' + specJob);
+
 
             var preparedRequest = {
                 'jsonrpc': '2.0',
@@ -128,7 +130,10 @@ function sleep(ms) {
 router.post('/', async function (req, res, next) {
 
     var workflow = await findWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
+    console.log('PLAYED WF:');
+    console.log(workflow);
     playWorkflow(workflow);
+
     res.send('OK');
 
 
