@@ -29,15 +29,18 @@ const Job_GripperRelease = require('../models/IJob');
 async function findOneWorkflow(id) {
 
 
-
-
-    return  Workflow.findById(id)
+    return Workflow.findById(id)
         .exec()
         .then(workflow => {
             console.log(workflow);
 
             //Some Mapping
-            var wf = {_id: workflow._id, name: workflow.name, _created_at: workflow.created_at, _jobsObjects: workflow.jobs};
+            var wf = {
+                _id: workflow._id,
+                name: workflow.name,
+                _created_at: workflow.created_at,
+                _jobsObjects: workflow.jobs
+            };
             return wf;
         })
         .catch();
@@ -96,7 +99,7 @@ router.post('/readOne', async function (req, res, next) {
     var workflow = await findOneWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
 
     //Get Job Details out ob DB (with FK List ob WF)
-    var jObjects =  await createJobList(workflow._jobsObjects);
+    var jObjects = await createJobList(workflow._jobsObjects);
 
     //Push Job Details into Workflow
     workflow._jobsObjects = jObjects;
@@ -121,9 +124,7 @@ router.post('/readAll', async function (req, res, next) {
     }
 
 
-
-
-        res.send(wf_list);
+    res.send(wf_list);
 
 
 });

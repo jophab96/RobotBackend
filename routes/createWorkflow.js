@@ -190,7 +190,7 @@ router.post('/', function (req, res, next) {
 
     console.log(inputWorkflow);
 
-    var processingWorkflowID = createWorkflow(inputWorkflow.name);
+    var processingWorkflowID = createWorkflow(inputWorkflow._name);
 
     prepareJobs(inputWorkflow._jobsObjects);
 
