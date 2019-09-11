@@ -7,7 +7,8 @@ var request = require('request');
 
 var workflowSchema = new Schema({
     _id: mongoose.Types.ObjectId,
-    created_at: Date,
+    name: { type: String, default: 'MyCustomName' },
+    created_at: { type: Date, default: Date.now },
     //jobs : [String]
 
     jobs: [{
@@ -23,10 +24,6 @@ class WorkFlow extends Model {
 
 
 
-    saySomething(text) {
-
-        console.log(text);
-    }
 
 
 }

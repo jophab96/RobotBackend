@@ -7,8 +7,6 @@ const Workflow = require('../models/workflow');
 const GRIPPER_GRIP = require('../models/job_gripper_grip');
 const GRIPPER_RELEASE = require('../models/job_gripper_release');
 
-const Job = require('../models/job');
-const Work = require('../models/work')
 
 var workflow;
 var job;

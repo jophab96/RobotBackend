@@ -78,11 +78,11 @@ function saveWorkflow() {
 
 }
 
-function createWorkflow(created_at) {
+function createWorkflow(name) {
 
     workflow = new Workflow({
         _id: new mongoose.Types.ObjectId(),
-        created_at: created_at,
+        name: name,
     });
 
     return workflow._id;
@@ -127,6 +127,7 @@ function findWorkflow(workflowID) {
             return workflow;
         })
         .catch();
+
 
 }
 
@@ -189,7 +190,7 @@ router.post('/', function (req, res, next) {
 
     console.log(inputWorkflow);
 
-    var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
+    var processingWorkflowID = createWorkflow(inputWorkflow.name);
 
     prepareJobs(inputWorkflow._jobsObjects);
 
