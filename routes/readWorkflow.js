@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var request = require('request');
 var URL = 'http://localhost:4000';
 const axios = require('axios');
-var List = require("collections/list");
 
 
 var SLEEP_INTERVALL = 500;
