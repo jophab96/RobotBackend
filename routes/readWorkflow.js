@@ -55,7 +55,7 @@ async function createJobList(jobs) {
     for (let job of jobs) {
 
         var dbJob = await findOneJob(job._id_job_fk);
-        var listjob = {_id: dbJob._id, name: dbJob.job_type};
+        var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: 30 };
         j.push(listjob);
 
 
