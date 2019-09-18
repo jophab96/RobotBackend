@@ -274,7 +274,7 @@ router.post('/updateWorkflow', async function (req, res, next) {
     //Save WF
     saveWorkflow();
 
-    res.send("ok");
+    res.send(workflow._id);
 
 
 
