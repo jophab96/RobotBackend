@@ -93,13 +93,14 @@ async function  getAvailableJobs(){
 
 async function getArmPosition(){
 
-    var armPosition = {x1:num(), y1:num(), z1:num(), x2:num(), y2:num() , z2:num(), w:num()};
+    var armPostition = [num(), num(),num(),num(),num(),num(),num()];
     return armPosition;
 }
 
 async function getBasePosition(){
 
-    var basePosition = {x1:num(), y1:num(), z1:num(), x2:num(), y2:num() , z2:num(), w:num()};
+   // var basePosition = {x1:num(), y1:num(), z1:num(), x2:num(), y2:num() , z2:num(), w:num()};
+    var basePosition = [num(), num(),num(),num(),num(),num(),num()];
     return basePosition;
 }
 

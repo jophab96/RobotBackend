@@ -37,7 +37,7 @@ async function findOneWorkflow(id) {
             //Some Mapping
             var wf = {
                 _id: workflow._id,
-                name: workflow.name,
+                _name: workflow.name,
                 _created_at: workflow.created_at,
                 _jobsObjects: workflow.jobs
             };
@@ -55,9 +55,23 @@ async function createJobList(jobs) {
     for (let job of jobs) {
 
         var dbJob = await findOneJob(job._id_job_fk);
-        var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: 30 };
-        j.push(listjob);
 
+        switch (dbJob.job_type) {
+
+
+            case (GRIPPER_GRIP_NAME):
+                var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
+                j.push(listjob);
+                break;
+
+            case (GRIPPER_RELEASE_NAME):
+                var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
+                j.push(listjob);
+                break;
+
+
+
+        }
 
     }
 
@@ -119,7 +133,7 @@ router.post('/readAll', async function (req, res, next) {
 
     for (let workflow of workflows) {
 
-        var wf = {_id: workflow._id, name: workflow.name, _created_at: workflow.created_at};
+        var wf = {_id: workflow._id, _name: workflow.name, _created_at: workflow.created_at};
         wf_list.push(wf);
     }
 

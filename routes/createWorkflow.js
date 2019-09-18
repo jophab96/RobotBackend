@@ -16,6 +16,7 @@ const Job_GripperRelease = require('../models/IJob');
 //JSON Input: jsondata
 
 var workflow;
+var updateJobsArray= [];
 
 function prepareJobs(inputJobs) {
 
@@ -51,11 +52,29 @@ function prepareJobs(inputJobs) {
         }
 
         pushJob(processingJob);
+        //updateJobsArray.push(processingJob);
     }
 
 }
 
+function updateJobs(wf_id){
+
+    console.log(wf_id);
+   // Workflow.findOneAndUpdate( {'_id': wf_id }, { set: {'jobs': [] } } )
+
+    Workflow.findOneAndUpdate({ _id: wf_id }, { $set: {'jobs': [] } },function(err) {
+        if (!err) {
+            console.log("Success")
+        }
+        else {
+            console.log("Error")
+        }
+    });
+
+}
+
 function pushJob(job) {
+
 
     workflow.jobs.push({_id_job_fk: job._id, job_type: job.job_type});
     job.save().then(result => {
@@ -201,7 +220,67 @@ router.post('/', function (req, res, next) {
 
 });
 
+/* POST methods listing. */
+router.post('/delteWorkflow', function (req, res, next) {
+
+    //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
+
+    let wfId = req.body.wf_id;
+
+    deleteWorkflow(wfId);
+
+    res.send('OK');
+
+
+});
+
+
 router.post('/updateWorkflow', async function (req, res, next) {
+
+    //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
+
+    let inputWorkflow = req.body.jsondata;
+
+    //GRAB ACTUAL WORKFLOW FROM DB
+    //console.log(req.body);
+
+    console.log("test");
+    console.log(inputWorkflow);
+
+    console.log(inputWorkflow._name);
+
+    workflow = await findWorkflow(inputWorkflow._id);
+
+    //Delete all WF Jobs from DB
+
+    console.log(workflow);
+    await deleteJobs(workflow);
+
+
+    workflow.update({ $set: {'jobs': [] } },function(err) {
+        if (!err) {
+            console.log("Success")
+        }
+        else {
+            console.log("Error")
+        }
+    });
+
+    //falsches n ameing
+    prepareJobs(inputWorkflow._jobsObjects);
+
+
+
+    //Save WF
+    saveWorkflow();
+
+    res.send("ok");
+
+
+
+
+});
+router.post('/updateWorkflow_old', async function (req, res, next) {
 
     let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
@@ -215,15 +294,22 @@ router.post('/updateWorkflow', async function (req, res, next) {
     console.log(workflow);
     await deleteJobs(workflow);
 
+
+
     //Delete WF from DB
-    await deleteWorkflow(workflow._id);
+   // await deleteWorkflow(workflow._id);
 
     //create WF
 
-    var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
+   // var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
 
     //Push Jobs into WF
     prepareJobs(inputWorkflow._jobsObjects);
+
+    console.log(updateJobsArray);
+
+
+
 
     //Save WF
     saveWorkflow();
