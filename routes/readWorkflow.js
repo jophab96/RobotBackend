@@ -19,7 +19,6 @@ var RPC_HEADER = {
 };
 
 const Workflow = require('../models/workflow');
-const WorkflowModel = require('../models/WorkflowModel');
 
 const IJob = require('../models/IJob');
 const Job_GripperGrip = require('../models/IJob');
@@ -55,6 +54,8 @@ async function createJobList(jobs) {
     for (let job of jobs) {
 
         var dbJob = await findOneJob(job._id_job_fk);
+
+        console.log(job._id_job_fk);
 
         switch (dbJob.job_type) {
 
@@ -93,7 +94,8 @@ function findAllWorkflows() {
 
 function findOneJob(id) {
 
-    console.log('IUD:' + id);
+    console.log(id);
+
     return IJob.findById(id)
         .exec()
         .then(specJob => {
@@ -102,21 +104,36 @@ function findOneJob(id) {
 
 };
 
+function formatWorkflows(workflows){
+
+    var wf_list = [];
+
+    for (let workflow of workflows) {
+
+        var wf = {_id: workflow._id, _name: workflow.name, _created_at: workflow.created_at};
+        wf_list.push(wf);
+    }
+
+    return wf_list;
+}
+
 
 /* POST methods listing. */
 // URL : /readWorkflow/readOne
 // Input: wf_id
 
+
 router.post('/readOne', async function (req, res, next) {
 
-    //Get Workflow out of DB
+    //Get Workflow out of DB (Key : wf:id)
     var workflow = await findOneWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
 
-    //Get Job Details out ob DB (with FK List ob WF)
-    var jObjects = await createJobList(workflow._jobsObjects);
+    console.log(workflow);
+    //Get Job Details out ob DB (with Jobs FK of WF)
+    var detailedJobs = await createJobList(workflow._jobsObjects);
 
     //Push Job Details into Workflow
-    workflow._jobsObjects = jObjects;
+    workflow._jobsObjects = detailedJobs;
 
     res.send(workflow);
 
@@ -126,44 +143,28 @@ router.post('/readOne', async function (req, res, next) {
 router.post('/readAll', async function (req, res, next) {
 
 
+    //Grab all WFs out of DB
     var workflows = await findAllWorkflows();
 
-    var wf_list = [];
+    //Format Workflows
+    var formatedWorkflows = formatWorkflows(workflows);
 
-
-    for (let workflow of workflows) {
-
-        var wf = {_id: workflow._id, _name: workflow.name, _created_at: workflow.created_at};
-        wf_list.push(wf);
-    }
-
-
-    res.send(wf_list);
+    res.send(formatedWorkflows);
 
 
 });
 
 router.post('/readOneJob', async function (req, res, next) {
 
-    var workflows = await findOneJob(mongoose.Types.ObjectId(req.body.job_id));
-    res.send(workflows);
+    //Grab one Job out of DB
+    var job = await findOneJob(mongoose.Types.ObjectId(req.body.job_id));
+
+    res.send(job);
 
 
 });
 
 
-/* GET workflow listing. */
-router.get('/', function (req, res, next) {
-
-    Workflow.find()
-        .exec()
-        .then(doc => {
-            console.log(doc);
-            res.status(200).json(doc);
-        })
-        .catch();
-
-});
 
 
 module.exports = router;

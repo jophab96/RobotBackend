@@ -4,21 +4,27 @@ var mongoose = require('mongoose');
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
+var MOVE_BASE_NAME = 'MoveBase';
+var MOVE_ARM_CARTESIAN_NAME = 'MoveArmCartesian';
 
 var GRIPPER_GRIP_RPC_NAME = 'trigger_gripper_grip';
 var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
+var MOVE_BASE_RPC_NAME = 'trigger_move_base';
+var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
 
 const Workflow = require('../models/workflow');
 const IJob = require('../models/IJob');
 const Job_GripperGrip = require('../models/IJob');
 const Job_GripperRelease = require('../models/IJob');
+const Job_MoveBase = require('../models/IJob');
+const Job_MoveArmCartesian = require('../models/IJob');
 
 //JSON Input: jsondata
 
 var workflow;
 var updateJobsArray= [];
 
-function prepareJobs(inputJobs) {
+function saveJobs(inputJobs) {
 
     var processingJob;
 
@@ -46,6 +52,26 @@ function prepareJobs(inputJobs) {
 
                 });
                 break;
+            case (MOVE_BASE_NAME):
+                processingJob = new Job_MoveBase({
+                    _id: new mongoose.Types.ObjectId(),
+                    job_type: MOVE_BASE_NAME,
+                    activationTimeout: job._activationTimeout,
+                    goalPose: [1,1,1,1,1,1,1],
+                    rpc_name: MOVE_BASE_RPC_NAME
+
+                });
+                break;
+            case (MOVE_ARM_CARTESIAN_NAME):
+                processingJob = new Job_MoveArmCartesian({
+                    _id: new mongoose.Types.ObjectId(),
+                    job_type: MOVE_ARM_CARTESIAN_NAME,
+                    activationTimeout: job._activationTimeout,
+                    goalPose: [1,1,1,1,1,1,1],
+                    rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
+
+                });
+                break;
             default:
                 break;
 
@@ -54,22 +80,6 @@ function prepareJobs(inputJobs) {
         pushJob(processingJob);
         //updateJobsArray.push(processingJob);
     }
-
-}
-
-function updateJobs(wf_id){
-
-    console.log(wf_id);
-   // Workflow.findOneAndUpdate( {'_id': wf_id }, { set: {'jobs': [] } } )
-
-    Workflow.findOneAndUpdate({ _id: wf_id }, { $set: {'jobs': [] } },function(err) {
-        if (!err) {
-            console.log("Success")
-        }
-        else {
-            console.log("Error")
-        }
-    });
 
 }
 
@@ -136,7 +146,6 @@ function deleteJobs(workflow) {
     }
 }
 
-
 function findWorkflow(workflowID) {
 
     return Workflow.findById(workflowID)
@@ -163,55 +172,17 @@ function deleteWorkflow(workflowID){
 
 };
 
-function deleteJob(jobID) {
-
-
-
-        IJob.remove({ _id: jobID}, function(err) {
-            if (!err) {
-                console.log("Success")
-            }
-            else {
-                console.log("Error")
-            }
-        });
-
-        Workflow.jobs.remove({ _id_job_fk: jobID}, function(err) {
-            if (!err) {
-                console.log("Success")
-            }
-            else {
-                console.log("Error")
-            }
-        });
-}
-
-
-function findJob(jobID){
-
-    return IJob.findById(jobID)
-        .exec()
-        .then(job => {
-            console.log(job);
-            return job;
-        })
-        .catch();
-
-
-}
-
-/* POST methods listing. */
 router.post('/', function (req, res, next) {
 
     //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
+    //Read Workflow Input out of Body
     let inputWorkflow = req.body.jsondata;
 
-    console.log(inputWorkflow);
-
+    //Saves Workflow into DB and returns WF-ID
     var processingWorkflowID = createWorkflow(inputWorkflow._name);
 
-    prepareJobs(inputWorkflow._jobsObjects);
+    saveJobs(inputWorkflow._jobsObjects);
 
     saveWorkflow();
 
@@ -220,7 +191,6 @@ router.post('/', function (req, res, next) {
 
 });
 
-/* POST methods listing. */
 router.post('/delteWorkflow', function (req, res, next) {
 
     //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
@@ -229,11 +199,10 @@ router.post('/delteWorkflow', function (req, res, next) {
 
     deleteWorkflow(wfId);
 
-    res.send('OK');
+    res.send(wfId);
 
 
 });
-
 
 router.post('/updateWorkflow', async function (req, res, next) {
 
@@ -241,19 +210,12 @@ router.post('/updateWorkflow', async function (req, res, next) {
 
     let inputWorkflow = req.body.jsondata;
 
-    //GRAB ACTUAL WORKFLOW FROM DB
-    //console.log(req.body);
-
-    console.log("test");
     console.log(inputWorkflow);
 
-    console.log(inputWorkflow._name);
-
+    //Grab Worfklow out of DB
     workflow = await findWorkflow(inputWorkflow._id);
 
     //Delete all WF Jobs from DB
-
-    console.log(workflow);
     await deleteJobs(workflow);
 
 
@@ -266,10 +228,8 @@ router.post('/updateWorkflow', async function (req, res, next) {
         }
     });
 
-    //falsches n ameing
-    prepareJobs(inputWorkflow._jobsObjects);
-
-
+    //save Jobs to Workflow
+    saveJobs(inputWorkflow._jobsObjects);
 
     //Save WF
     saveWorkflow();
@@ -277,44 +237,6 @@ router.post('/updateWorkflow', async function (req, res, next) {
     res.send(workflow._id);
 
 
-
-
-});
-router.post('/updateWorkflow_old', async function (req, res, next) {
-
-    let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
-
-    // let inputWorkflow = req.body.jsondata;
-
-    //GRAB ACTUAL WORKFLOW FROM DB
-    var workflow = await findWorkflow(inputWorkflow._id);
-
-    //Delete all WF Jobs from DB
-
-    console.log(workflow);
-    await deleteJobs(workflow);
-
-
-
-    //Delete WF from DB
-   // await deleteWorkflow(workflow._id);
-
-    //create WF
-
-   // var processingWorkflowID = createWorkflow(inputWorkflow._created_at);
-
-    //Push Jobs into WF
-    prepareJobs(inputWorkflow._jobsObjects);
-
-    console.log(updateJobsArray);
-
-
-
-
-    //Save WF
-    saveWorkflow();
-
-    res.send(processingWorkflowID);
 
 
 });
@@ -331,11 +253,6 @@ router.post('/deleteAll', async function (req, res, next) {
 
 });
 
-
-
-
-
-/* GET workflow listing. */
 router.get('/', function (req, res, next) {
 
 

@@ -6,7 +6,6 @@ var logger = require('morgan');
 var mongoose = require ('mongoose');
 
 var indexRouter = require('./routes/index');
-var saveWorkflowRouter = require('./routes/saveWorkflow');
 var playWorkflowRouter = require('./routes/playWorkflow');
 var createWorkflowRouter = require('./routes/createWorkflow');
 var readWorkflowRouter = require('./routes/readWorkflow');
@@ -27,7 +26,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/saveWorkflow', saveWorkflowRouter);
 app.use('/playWorkflow', playWorkflowRouter);
 app.use('/createWorkflow', createWorkflowRouter);
 app.use('/readWorkflow', readWorkflowRouter);

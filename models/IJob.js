@@ -21,9 +21,17 @@ const GripperGripSchema = extendSchema(JobSchema, {
 
 });
 
+const MoveBaseSchema = extendSchema(JobSchema, {
+    job_type: String,
+    rpc_name: { type: String, default: 'trigger_move_base' },
+    goalPose: [Number]
 
+});
+
+module.exports = mongoose.model('Job_MoveBase', MoveBaseSchema);
 
 module.exports = mongoose.model('IJob', JobSchema);
 module.exports = mongoose.model('Job_GripperGrip', GripperGripSchema);
 module.exports = mongoose.model('Job_GripperRelease', GripperReleaseSchema);
+
 

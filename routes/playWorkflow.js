@@ -9,6 +9,8 @@ var SLEEP_INTERVALL = 500;
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
+var MOVE_BASE_NAME = 'MoveBase';
+var MOVE_ARM_CARTESIAN_NAME = 'MoveArmCartesian';
 
 var RPC_HEADER = {
     headers: {
@@ -22,8 +24,38 @@ const IJob = require('../models/IJob');
 const Job_GripperGrip = require('../models/IJob');
 const Job_GripperRelease = require('../models/IJob');
 
+function prepareJob(job) {
+
+    var preparedRequest = {
+        'jsonrpc': '2.0',
+        'id': '1',
+        'method': job.rpc_name,
+        'params': []
+    };
+
+    switch (job.job_type) {
+        case (GRIPPER_GRIP_NAME):
+            var params = [{'activation_timeout': job.activationTimeout}];
+            break;
+
+        case (GRIPPER_RELEASE_NAME):
+            var params = [{'activation_timeout': job.activationTimeout}];
+            break;
+
+        case (MOVE_BASE_NAME):
+            var params = [{'activation_timeout': job.activationTimeout,'goalPose':job.goalPose}];
+            break;
+
+        case (MOVE_ARM_CARTESIAN_NAME):
+            var params = [{'activation_timeout': job.activationTimeout,'goalPose':job.goalPose}];
+            break;
+    }
 
 
+    preparedRequest.params = params;
+
+    return preparedRequest;
+}
 
 const sendToServer = async jsonData => {
 
@@ -73,40 +105,34 @@ const checkJobState = async jobID => {
 
 async function playWorkflow(workflow) {
 
+    var playJob;
+    var preparedString;
+    var activeJobID;
+
     for (let job of workflow.jobs) {
-
-        var activeJobID;
-        var jsonData;
-
-        jsonData = await findJob(job);
-        activeJobID = await sendToServer(jsonData);
+        //Grab out the detailed Job of the DB
+        playJob = await findOneJob(job._id_job_fk);
+        //Transform Job into jsonString
+        preparedString = prepareJob(playJob);
+        //Send job to server
+        activeJobID = await sendToServer(preparedString);
+        //Waits until job is finished
         await checkJobState(activeJobID);
     }
 
 
 }
 
-function findJob(job) {
 
-    console.log(job._id_job_fk);
-    return IJob.findById(job._id_job_fk)
+function findOneJob(id) {
+
+    return IJob.findById(id)
         .exec()
         .then(specJob => {
-
-            console.log('FIND' + specJob);
-
-
-            var preparedRequest = {
-                'jsonrpc': '2.0',
-                'id': '1',
-                'method': specJob.rpc_name,
-                'params': [{'activation_timeout': specJob.activationTimeout}]
-            };
-
-            return preparedRequest;
-
+            return specJob;
         });
-}
+
+};
 
 function findWorkflow(id) {
 
@@ -134,7 +160,7 @@ router.post('/', async function (req, res, next) {
     console.log(workflow);
     playWorkflow(workflow);
 
-    res.send('OK');
+    res.send(workflow._id);
 
 
 });
@@ -151,7 +177,6 @@ router.get('/', function (req, res, next) {
         .catch();
 
 });
-
 
 
 module.exports = router;
