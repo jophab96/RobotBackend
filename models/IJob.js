@@ -28,7 +28,15 @@ const MoveBaseSchema = extendSchema(JobSchema, {
 
 });
 
+const MoveArmSchema = extendSchema(JobSchema, {
+    job_type: String,
+    rpc_name: { type: String, default: 'trigger_move_arm_cartesian' },
+    goalPose: [Number]
+
+});
+
 module.exports = mongoose.model('Job_MoveBase', MoveBaseSchema);
+module.exports = mongoose.model('Job_MoveArm', MoveBaseSchema);
 
 module.exports = mongoose.model('IJob', JobSchema);
 module.exports = mongoose.model('Job_GripperGrip', GripperGripSchema);

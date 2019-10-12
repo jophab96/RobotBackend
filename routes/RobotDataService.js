@@ -5,6 +5,12 @@ var request = require('request');
 var URL = 'http://localhost:4000';
 const axios = require('axios');
 
+var Job = require('../models/Job').Job;
+var DBManager = require('../models/DBManager').DBManager;
+var ChimeraManager = require('../models/ChimeraManager').ChimeraManager;
+
+var GripperGripJob = require('../models/GripperGripJob').GripperGripJob;
+
 var SLEEP_INTERVALL = 500;
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
@@ -16,6 +22,9 @@ var RPC_HEADER = {
         'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2JvdElkIjoiY2hpbWVyYTEiLCJleHBpcmVzIjozMTUzNjAwMH0.fPubN5HhuKhmg0o8gL5NA7TCNbtLdL6FxkG_B8A3U1s'
     }
 };
+
+
+const chimeraMng = new ChimeraManager();
 
 const Workflow = require('../models/workflow');
 
@@ -108,7 +117,7 @@ async function getBasePosition(){
 router.post('/getAvailableJobs', async function (req, res, next) {
 
 
-    res.send( await getAvailableJobs());
+    res.send( await chimeraMng.getAvailableJobs());
 
 
 });
@@ -116,7 +125,7 @@ router.post('/getAvailableJobs', async function (req, res, next) {
 router.post('/getArmPosition', async function (req, res, next) {
 
 
-    res.send( await getArmPosition());
+    res.send( await chimeraMng.getArmPosition());
 
 
 });
@@ -124,11 +133,24 @@ router.post('/getArmPosition', async function (req, res, next) {
 router.post('/getBasePosition', async function (req, res, next) {
 
 
-    res.send( await getBasePosition());
+    res.send( await chimeraMng.getBasePosition());
 
 
 });
 
+
+router.post('/test', async function (req, res, next) {
+
+
+
+
+    console.log( await chimeraMng.getAvailableJobs());
+
+
+    res.send('ok');
+
+
+});
 
 
 /* GET workflow listing. */

@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 
+var DBManager = require('../models/DBManager').DBManager;
+
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
 var MOVE_BASE_NAME = 'MoveBase';
@@ -19,6 +21,8 @@ const Job_GripperRelease = require('../models/IJob');
 const Job_MoveBase = require('../models/IJob');
 const Job_MoveArmCartesian = require('../models/IJob');
 
+const dataBaseManager = new DBManager();
+
 //JSON Input: jsondata
 
 var workflow;
@@ -29,9 +33,6 @@ function saveJobs(inputJobs) {
     var processingJob;
 
     for (let job of inputJobs) {
-
-        console.log('Preparing job:');
-        console.log(job._name);
 
         switch (job._name) {
 
@@ -57,7 +58,7 @@ function saveJobs(inputJobs) {
                     _id: new mongoose.Types.ObjectId(),
                     job_type: MOVE_BASE_NAME,
                     activationTimeout: job._activationTimeout,
-                    goalPose: [1,1,1,1,1,1,1],
+                    goalPose: job._goalPose,
                     rpc_name: MOVE_BASE_RPC_NAME
 
                 });
@@ -67,7 +68,7 @@ function saveJobs(inputJobs) {
                     _id: new mongoose.Types.ObjectId(),
                     job_type: MOVE_ARM_CARTESIAN_NAME,
                     activationTimeout: job._activationTimeout,
-                    goalPose: [1,1,1,1,1,1,1],
+                    goalPose: job._goalPose,
                     rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
 
                 });
@@ -78,7 +79,6 @@ function saveJobs(inputJobs) {
         }
 
         pushJob(processingJob);
-        //updateJobsArray.push(processingJob);
     }
 
 }
@@ -172,21 +172,37 @@ function deleteWorkflow(workflowID){
 
 };
 
-router.post('/', function (req, res, next) {
+router.post('/', async function (req, res, next) {
 
     //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
 
+    /**
     //Read Workflow Input out of Body
     let inputWorkflow = req.body.jsondata;
 
     //Saves Workflow into DB and returns WF-ID
     var processingWorkflowID = createWorkflow(inputWorkflow._name);
 
+
+
     saveJobs(inputWorkflow._jobsObjects);
 
     saveWorkflow();
 
     res.send(processingWorkflowID);
+**/
+
+
+    let inputWorkflow = req.body.jsondata;
+
+    dataBaseManager.open()
+    var processingWorkflowID =dataBaseManager.createWorkflow(inputWorkflow._name);
+    dataBaseManager.addJobs(inputWorkflow._jobsObjects);
+    dataBaseManager.close();
+    res.send(processingWorkflowID);
+
+
+
 
 
 });
@@ -194,13 +210,21 @@ router.post('/', function (req, res, next) {
 router.post('/delteWorkflow', function (req, res, next) {
 
     //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
-
+/**
     let wfId = req.body.wf_id;
 
     deleteWorkflow(wfId);
 
     res.send(wfId);
 
+**/
+
+
+    let wfId = req.body.wf_id;
+
+    dataBaseManager.deleteWorkflow(wfId);
+
+    res.send(wfId);
 
 });
 
@@ -213,6 +237,10 @@ router.post('/updateWorkflow', async function (req, res, next) {
     console.log(inputWorkflow);
 
     //Grab Worfklow out of DB
+
+     await dataBaseManager.updateWorkflow(inputWorkflow);
+
+    /**
     workflow = await findWorkflow(inputWorkflow._id);
 
     //Delete all WF Jobs from DB
@@ -233,6 +261,7 @@ router.post('/updateWorkflow', async function (req, res, next) {
 
     //Save WF
     saveWorkflow();
+**/
 
     res.send(workflow._id);
 
