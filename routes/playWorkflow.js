@@ -19,10 +19,19 @@ var RPC_HEADER = {
     }
 };
 
-const Workflow = require('../models/workflow');
-const IJob = require('../models/IJob');
-const Job_GripperGrip = require('../models/IJob');
-const Job_GripperRelease = require('../models/IJob');
+const Workflow = require('../db-models/workflow');
+const IJob = require('../db-models/IJob');
+const Job_GripperGrip = require('../db-models/IJob');
+const Job_GripperRelease = require('../db-models/IJob');
+
+var DBManager = require('../modules/DBManager').DBManager;
+var ChimeraManager = require('../modules/ChimeraManager').ChimeraManager;
+
+
+const dataBaseManager = new DBManager();
+const chimeraMng = new ChimeraManager();
+
+
 
 function prepareJob(job) {
 
@@ -155,14 +164,20 @@ function sleep(ms) {
 /* POST methods listing. */
 router.post('/', async function (req, res, next) {
 
-    var workflow = await findWorkflow(mongoose.Types.ObjectId(req.body.wf_id));
-    console.log('PLAYED WF:');
-    console.log(workflow);
-    playWorkflow(workflow);
 
-    res.send(workflow._id);
+    var workflowID = req.body.wf_id;
+    var playList = await dataBaseManager.createPlayList(workflowID);
 
 
+    console.log('FINAL PLAYLIST');
+    console.log(playList);
+    chimeraMng.play(playList);
+
+
+    var result = new Object();
+    result.wf_id = workflowID;
+
+    res.send(result);
 });
 
 /* GET workflow listing. */

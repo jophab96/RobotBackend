@@ -6,10 +6,9 @@ var URL = 'http://localhost:4000';
 const axios = require('axios');
 
 var Job = require('../models/Job').Job;
-var DBManager = require('../models/DBManager').DBManager;
-var ChimeraManager = require('../models/ChimeraManager').ChimeraManager;
+var ChimeraManager = require('../modules/ChimeraManager').ChimeraManager;
 
-var GripperGripJob = require('../models/GripperGripJob').GripperGripJob;
+var GripperGripJob = require('../db-models/GripperGripJob').GripperGripJob;
 
 var SLEEP_INTERVALL = 500;
 
@@ -26,7 +25,7 @@ var RPC_HEADER = {
 
 const chimeraMng = new ChimeraManager();
 
-const Workflow = require('../models/workflow');
+const Workflow = require('../db-models/workflow');
 
 
 const sendToServer = async jsonData => {
@@ -102,14 +101,14 @@ async function  getAvailableJobs(){
 
 async function getArmPosition(){
 
-    var armPostition = [num(), num(),num(),num(),num(),num(),num()];
+    var armPosition = [num(), num(),num(),num(),num(),num(),num(),num()];
     return armPosition;
 }
 
 async function getBasePosition(){
 
    // var basePosition = {x1:num(), y1:num(), z1:num(), x2:num(), y2:num() , z2:num(), w:num()};
-    var basePosition = [num(), num(),num(),num(),num(),num(),num()];
+    var basePosition = [num(), num(),num(),num(),num(),num(),num(),num()];
     return basePosition;
 }
 
@@ -144,7 +143,6 @@ router.post('/test', async function (req, res, next) {
 
 
 
-    console.log( await chimeraMng.getAvailableJobs());
 
 
     res.send('ok');

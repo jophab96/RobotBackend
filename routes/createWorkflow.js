@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 
-var DBManager = require('../models/DBManager').DBManager;
+var DBManager = require('../modules/DBManager').DBManager;
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
@@ -14,12 +14,12 @@ var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
 var MOVE_BASE_RPC_NAME = 'trigger_move_base';
 var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
 
-const Workflow = require('../models/workflow');
-const IJob = require('../models/IJob');
-const Job_GripperGrip = require('../models/IJob');
-const Job_GripperRelease = require('../models/IJob');
-const Job_MoveBase = require('../models/IJob');
-const Job_MoveArmCartesian = require('../models/IJob');
+const Workflow = require('../db-models/workflow');
+const IJob = require('../db-models/IJob');
+const Job_GripperGrip = require('../db-models/IJob');
+const Job_GripperRelease = require('../db-models/IJob');
+const Job_MoveBase = require('../db-models/IJob');
+const Job_MoveArmCartesian = require('../db-models/IJob');
 
 const dataBaseManager = new DBManager();
 
@@ -28,175 +28,21 @@ const dataBaseManager = new DBManager();
 var workflow;
 var updateJobsArray= [];
 
-function saveJobs(inputJobs) {
-
-    var processingJob;
-
-    for (let job of inputJobs) {
-
-        switch (job._name) {
-
-            case (GRIPPER_GRIP_NAME):
-                processingJob = new Job_GripperGrip({
-                    _id: new mongoose.Types.ObjectId(),
-                    job_type: GRIPPER_GRIP_NAME,
-                    activationTimeout: job._activationTimeout,
-                    rpc_name: GRIPPER_GRIP_RPC_NAME
-                });
-                break;
-            case (GRIPPER_RELEASE_NAME):
-                processingJob = new Job_GripperRelease({
-                    _id: new mongoose.Types.ObjectId(),
-                    job_type: GRIPPER_RELEASE_NAME,
-                    activationTimeout: job._activationTimeout,
-                    rpc_name: GRIPPER_RELEASE_RPC_NAME
-
-                });
-                break;
-            case (MOVE_BASE_NAME):
-                processingJob = new Job_MoveBase({
-                    _id: new mongoose.Types.ObjectId(),
-                    job_type: MOVE_BASE_NAME,
-                    activationTimeout: job._activationTimeout,
-                    goalPose: job._goalPose,
-                    rpc_name: MOVE_BASE_RPC_NAME
-
-                });
-                break;
-            case (MOVE_ARM_CARTESIAN_NAME):
-                processingJob = new Job_MoveArmCartesian({
-                    _id: new mongoose.Types.ObjectId(),
-                    job_type: MOVE_ARM_CARTESIAN_NAME,
-                    activationTimeout: job._activationTimeout,
-                    goalPose: job._goalPose,
-                    rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
-
-                });
-                break;
-            default:
-                break;
-
-        }
-
-        pushJob(processingJob);
-    }
-
-}
-
-function pushJob(job) {
-
-
-    workflow.jobs.push({_id_job_fk: job._id, job_type: job.job_type});
-    job.save().then(result => {
-
-        console.log(result);
-        return result._id;
-    });
 
 
 
-}
 
-function saveWorkflow() {
-
-    workflow.save().then(result => {
-        console.log(result);
-        return result._id;
-    });
-
-
-}
-
-function createWorkflow(name) {
-
-    workflow = new Workflow({
-        _id: new mongoose.Types.ObjectId(),
-        name: name,
-    });
-
-    return workflow._id;
-
-}
-
-function printAllWorkflows(){
-
-  Workflow.find()
-        .exec()
-        .then(doc => {
-        console.log(doc);
-
-        })
-        .catch();
-
-}
-
-function deleteJobs(workflow) {
-
-    for (let job of workflow.jobs) {
-
-        IJob.deleteMany({ _id: job._id_job_fk }, function(err) {
-            if (!err) {
-                console.log("Success")
-            }
-            else {
-                console.log("Error")
-            }
-        });
-
-    }
-}
-
-function findWorkflow(workflowID) {
-
-    return Workflow.findById(workflowID)
-        .exec()
-        .then(workflow => {
-            console.log(workflow);
-            return workflow;
-        })
-        .catch();
-
-
-}
-
-function deleteWorkflow(workflowID){
-
-    Workflow.remove({ _id: workflowID }, function(err) {
-        if (!err) {
-            console.log("Success")
-        }
-        else {
-            console.log("Error")
-        }
-    });
-
-};
 
 router.post('/', async function (req, res, next) {
 
-    //let inputWorkflow = JSON.parse(req.body.jsondata); // string to generic object first
-
-    /**
-    //Read Workflow Input out of Body
-    let inputWorkflow = req.body.jsondata;
-
-    //Saves Workflow into DB and returns WF-ID
-    var processingWorkflowID = createWorkflow(inputWorkflow._name);
-
-
-
-    saveJobs(inputWorkflow._jobsObjects);
-
-    saveWorkflow();
-
-    res.send(processingWorkflowID);
-**/
 
 
     let inputWorkflow = req.body.jsondata;
 
     dataBaseManager.open()
     var processingWorkflowID =dataBaseManager.createWorkflow(inputWorkflow._name);
+    console.log('input');
+    console.log(inputWorkflow._jobsObjects);
     dataBaseManager.addJobs(inputWorkflow._jobsObjects);
     dataBaseManager.close();
     res.send(processingWorkflowID);

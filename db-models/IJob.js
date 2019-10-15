@@ -3,11 +3,10 @@ const extendSchema = require('mongoose-extend-schema');
 
 const JobSchema = new mongoose.Schema({
     _id:{type: mongoose.Types.ObjectId},
-    activationTimeout:{type:Number},
-
+    activationTimeout:{type:Number}
 
 });
-
+/**
 // Extend JobSchema
 const GripperReleaseSchema = extendSchema(JobSchema, {
     job_type: String,
@@ -35,11 +34,17 @@ const MoveArmSchema = extendSchema(JobSchema, {
 
 });
 
-module.exports = mongoose.model('Job_MoveBase', MoveBaseSchema);
-module.exports = mongoose.model('Job_MoveArm', MoveBaseSchema);
-
-module.exports = mongoose.model('IJob', JobSchema);
-module.exports = mongoose.model('Job_GripperGrip', GripperGripSchema);
-module.exports = mongoose.model('Job_GripperRelease', GripperReleaseSchema);
 
 
+**/
+
+
+
+module.exports = mongoose.model('IJob', JobSchema,'TEST');
+/**
+module.exports = mongoose.model('Job_MoveBase', MoveBaseSchema,);
+module.exports = mongoose.model('Job_MoveArm', MoveArmSchema,);
+module.exports = mongoose.model('Job_GripperGrip', GripperGripSchema,);
+module.exports = mongoose.model('Job_GripperRelease', GripperReleaseSchema,);
+
+**/

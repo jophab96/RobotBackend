@@ -9,6 +9,9 @@ var indexRouter = require('./routes/index');
 var playWorkflowRouter = require('./routes/playWorkflow');
 var createWorkflowRouter = require('./routes/createWorkflow');
 var readWorkflowRouter = require('./routes/readWorkflow');
+var deleteWorkflowRouter = require('./routes/deleteWorkflow');
+
+var updateWorkflowRouter = require('./routes/updateWorkflow');
 var RobotDataServiceRouter = require('./routes/RobotDataService');
 
 
@@ -27,8 +30,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/playWorkflow', playWorkflowRouter);
+app.use('/deleteWorkflow', deleteWorkflowRouter);
 app.use('/createWorkflow', createWorkflowRouter);
 app.use('/readWorkflow', readWorkflowRouter);
+app.use('/updateWorkflow', updateWorkflowRouter);
 app.use('/RobotDataService', RobotDataServiceRouter);
 
 
