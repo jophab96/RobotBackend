@@ -4,19 +4,18 @@ var mongoose = require('mongoose');
 const Workflow = require('../db-models/workflow');
 
 /**
-const IJob = require('../models/IJob');
-const Job_GripperGrip = require('../models/IJob');
-const Job_GripperRelease = require('../models/IJob');
-const Job_MoveBase = require('../models/IJob');
-const Job_MoveArmCartesian = require('../models/IJob');
+ const IJob = require('../models/IJob');
+ const Job_GripperGrip = require('../models/IJob');
+ const Job_GripperRelease = require('../models/IJob');
+ const Job_MoveBase = require('../models/IJob');
+ const Job_MoveArmCartesian = require('../models/IJob');
 
  **/
 const IJob = require('../db-models/IJob');
-const Job_GripperGrip = require ('../db-models/GripperGripJob');
-const Job_GripperRelease =  require ('../db-models/GripperReleaseJob');
+const Job_GripperGrip = require('../db-models/GripperGripJob');
+const Job_GripperRelease = require('../db-models/GripperReleaseJob');
 const Job_MoveBase = require('../db-models/MoveBaseJob');
 const Job_MoveArmCartesian = require('../db-models/MoveArmCartesianJob');
-
 
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
@@ -50,13 +49,61 @@ class DBManager {
 
     }
 
+    async createJobList(jobs) {
 
-   async createPlayList(id){
+        var j = [];
 
-        var workflowID  = mongoose.Types.ObjectId(id);
+        for (let job of jobs) {
+
+            var dbJob = await this.findOneJob(mongoose.Types.ObjectId(job._id_job_fk));
+
+            switch (dbJob.job_type) {
+
+
+                case (GRIPPER_GRIP_NAME):
+
+                    var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
+                    j.push(listjob);
+                    break;
+
+                case (GRIPPER_RELEASE_NAME):
+                    var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
+                    j.push(listjob);
+                    break;
+
+                case (MOVE_BASE_NAME):
+                    var listjob = {
+                        _id: dbJob._id,
+                        _name: dbJob.job_type,
+                        _activationTimeout: dbJob.activationTimeout,
+                        _goalPose: dbJob.goalPose
+                    };
+                    j.push(listjob);
+                    break;
+
+                case (MOVE_ARM_CARTESIAN_NAME):
+                    var listjob = {
+                        _id: dbJob._id,
+                        _name: dbJob.job_type,
+                        _activationTimeout: dbJob.activationTimeout,
+                        _goalPose: dbJob.goalPose
+                    };
+                    j.push(listjob);
+                    break;
+            }
+        }
+
+        return j;
+
+    }
+
+    async createPlayList(id) {
+
+
+        var workflowID = mongoose.Types.ObjectId(id);
         var playWorkflow = await this.findWorkflow(workflowID);
         var playJob;
-        var playList=[];
+        var playList = [];
 
 
         for (let job of playWorkflow.jobs) {
@@ -74,6 +121,7 @@ class DBManager {
 
     }
 
+    //Input: ID, Output: Workflow with Input ID
     findWorkflow(workflowID) {
 
         return Workflow.findById(workflowID)
@@ -88,9 +136,10 @@ class DBManager {
 
     }
 
+    //Output: All Workflows
     findAllWorkflows() {
 
-       return Workflow.find()
+        return Workflow.find()
             .exec()
             .then(doc => {
                 return doc;
@@ -100,11 +149,12 @@ class DBManager {
 
     }
 
-    //with mapping
+    //Finds one Workflow but Output Mapping is different
     async findOneMappedWorkflow(id) {
 
+    var workFlowID = mongoose.Types.ObjectId(id);
 
-        return Workflow.findById(id)
+        return Workflow.findById(workFlowID)
             .exec()
             .then(workflow => {
                 console.log(workflow);
@@ -123,11 +173,14 @@ class DBManager {
 
     }
 
+    //Finds one Job
     findOneJob(id) {
 
-        console.log(id);
+        var jobID = mongoose.Types.ObjectId(id);
 
-        return IJob.findById(id)
+        console.log(jobID);
+
+        return IJob.findById(jobID)
             .exec()
             .then(specJob => {
                 console.log(specJob);
@@ -137,15 +190,13 @@ class DBManager {
 
     };
 
-
+    //Deletes all Jobs from Workflow, holds old Workflow, add Jobs of new Workflow (WF ID is the same)
     async updateWorkflow(inputWorkflow) {
 
         this.workflow = await this.findWorkflow(inputWorkflow._id);
 
-
         //Delete all WF Jobs from DB
         await this.deleteJobs(this.workflow);
-
 
         this.workflow.update({$set: {'jobs': []}}, function (err) {
             if (!err) {
@@ -163,6 +214,7 @@ class DBManager {
 
     }
 
+    //Deletes Workflow from DB
     deleteWorkflow(workflowID) {
 
         Workflow.remove({_id: workflowID}, function (err) {
@@ -174,6 +226,7 @@ class DBManager {
         });
     }
 
+    //Delete all Workflows AND Jobs,  for Cleaning up DB
     deleteAllWorkflows() {
 
         Workflow.remove({}, function (err) {
@@ -185,7 +238,7 @@ class DBManager {
         });
     }
 
-
+    //Input: JOB FK ID, deletes all Jobs from an Spec Workflow
     deleteJobs(workflow) {
 
         for (let job of workflow.jobs) {
@@ -201,7 +254,7 @@ class DBManager {
         }
     }
 
-
+    //Input: Name of Workflow, Return WF_ID
     createWorkflow(name) {
 
         this.workflow = new Workflow({
@@ -215,12 +268,12 @@ class DBManager {
         return this.workflow._id;
     }
 
+    //adds Jobs to actual Processes Workflow (NAME: workflow)
     addJobs(inputJobs) {
 
         var processingJob;
 
         for (let job of inputJobs) {
-
 
             console.log(job._name);
             switch (job._name) {
@@ -230,7 +283,7 @@ class DBManager {
                         _id: new mongoose.Types.ObjectId(),
                         job_type: GRIPPER_GRIP_NAME,
                         activationTimeout: job._activationTimeout,
-                       // rpc_name: GRIPPER_GRIP_RPC_NAME
+                        // rpc_name: GRIPPER_GRIP_RPC_NAME
                     });
                     break;
                 case (GRIPPER_RELEASE_NAME):
@@ -238,7 +291,7 @@ class DBManager {
                         _id: new mongoose.Types.ObjectId(),
                         job_type: GRIPPER_RELEASE_NAME,
                         activationTimeout: job._activationTimeout,
-                       // rpc_name: GRIPPER_RELEASE_RPC_NAME
+                        // rpc_name: GRIPPER_RELEASE_RPC_NAME
 
                     });
                     break;
@@ -248,7 +301,7 @@ class DBManager {
                         job_type: MOVE_BASE_NAME,
                         activationTimeout: job._activationTimeout,
                         goalPose: job._goalPose,
-                       // rpc_name: MOVE_BASE_RPC_NAME
+                        // rpc_name: MOVE_BASE_RPC_NAME
 
                     });
                     break;
@@ -258,7 +311,7 @@ class DBManager {
                         job_type: MOVE_ARM_CARTESIAN_NAME,
                         activationTimeout: job._activationTimeout,
                         goalPose: job._goalPose,
-                       // rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
+                        // rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
 
                     });
                     break;
@@ -277,8 +330,6 @@ class DBManager {
         }
 
     }
-
-
 
 
     close() {

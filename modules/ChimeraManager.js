@@ -1,27 +1,26 @@
-const axios = require('axios');
-
-//const Definitions = require('../bin/definitions').Definitions;
+var HTTPManager = require('../modules/HTTPManager').HTTPManager;
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
 var MOVE_BASE_NAME = 'BaseMove';
 var MOVE_ARM_CARTESIAN_NAME = 'ArmCartesian';
 
-var GRIPPER_GRIP_RPC_NAME = 'trigger_gripper_grip';
-var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
-var MOVE_BASE_RPC_NAME = 'trigger_move_base';
-var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
+var JOB_STATE_ACTIVE = 'active';
 
-var RPC_HEADER = {
-    headers: {
-        'user': 'intern',
-        'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2JvdElkIjoiY2hpbWVyYTEiLCJleHBpcmVzIjozMTUzNjAwMH0.fPubN5HhuKhmg0o8gL5NA7TCNbtLdL6FxkG_B8A3U1s'
-    }
-};
-var URL = 'http://localhost:4000';
 var SLEEP_INTERVALL = 500;
-var preparedString;
 var activeJobID;
+var workflowProgress = 0;
+
+var socketApi = require('../modules/socketApi');
+var io = socketApi.io;
+const port = process.env.PORT || 3030;
+io.listen(port);
+
+//const io = require('socket.io')(server);
+
+
+
+httpManager = new HTTPManager();
 
 class ChimeraManager {
 
@@ -32,94 +31,66 @@ class ChimeraManager {
         }
 
         ChimeraManager.instance = this;
-
         return this;
     }
 
+    //Sets Playlist
 
-    async play(playList) {
+    setPlayList(playList) {
 
-        for (let playJob of playList) {
-            preparedString = this.prepareJob(playJob);
-            //Send job to server
-            activeJobID = await this.sendToServer(preparedString);
-            //Waits until job is finished
-            await this.checkJobState(activeJobID.job_id);
-        }
+        this.playList = playList;
+
     }
 
-    async checkJobState(jobID) {
+    //Spinner HERE!
+    //Playplaylist, sends Play Object to HTTPManager, Polling until finished
+    async playPlayList() {
 
-        var jsonDataObj = {
-            'jsonrpc': '2.0',
-            'id': '1',
-            'method': 'get_workflow_progress',
-            'params': [{'job_id': jobID}]
-        };
+        //count Jobs
 
-        try {
+        let jobsCount = 0;
+        for (let playJob of this.playList) {
+            jobsCount++;
+        }
 
-            var response = await axios.post(URL, jsonDataObj, RPC_HEADER);
+        for (let playJob of this.playList) {
 
-            while (response.data.result.job_state == 'active') {
+            activeJobID = await httpManager.sendJob(this.prepareJob(playJob));
 
-                console.log('WAITING, ');
-                console.log(response.data.result);
-
+            while (await httpManager.checkJobState(activeJobID) == JOB_STATE_ACTIVE) {
+                console.log('Working on JOB: ' + activeJobID);
                 await this.sleep(SLEEP_INTERVALL);
-                response = await axios.post(URL, jsonDataObj, RPC_HEADER);
             }
-            const data = response.data;
-            console.log(data);
-            return response.data.result;
 
-
-        } catch (error) {
-            console.log(error);
+            workflowProgress = workflowProgress + (1/jobsCount);
+            socketApi.updateWorkflowProgress(workflowProgress);
         }
-    };
-
-    async sendToServer(jsonData) {
 
 
-
-        try {
-
-            console.log('JSON DATA TO SEND');
-            console.log(jsonData);
-
-            const response = await axios.post(URL, jsonData, RPC_HEADER);
-            return response.data.result;
-
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    }
 
     async getAvailableJobs() {
 
-        var preparedRequest = {
-            'jsonrpc': '2.0',
-            'id': '1',
-            'method': 'get_available_workflows',
-            'params': [{}]
-        };
-
-
-        return await this.sendToServer(preparedRequest);
-
+        return await httpManager.pullJobs();
     }
 
+    //Mocks Arm Position
     async getArmPosition() {
 
         var armPosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return armPosition;
     }
 
+    //Mocks Base Position
     async getBasePosition() {
 
         var basePosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return basePosition;
+    }
+
+    getWorkflowProgress(){
+
+        return workflowProgress;
     }
 
     num() {
