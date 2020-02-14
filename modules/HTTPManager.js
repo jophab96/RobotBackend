@@ -38,6 +38,7 @@ class HTTPManager {
 
     //Request Job State from Chimera (active, done, canceled, etc..)
     async checkJobState(jobID) {
+        console.log("IN CHECK JOB 1");
 
         var jsonDataObj = {
             'jsonrpc': '2.0',
@@ -46,56 +47,40 @@ class HTTPManager {
             'params': [{'job_id': jobID}]
         };
 
-        try {
+        return new Promise((resolve, reject) => {
 
-            response = await axios.post(URL, jsonDataObj, RPC_HEADER);
-            console.log('From Check Job State');
-            console.log(response.data);
+            axios.post(URL, jsonDataObj, RPC_HEADER).then(response => {
+                console.log("Check Job State from Job ID: " + jobID);
+                console.log(response.data.result);
+                resolve(response.data.result.job_state);
 
-            return response.data.result.job_state;
+            })
+                .catch(error => {
+                    console.log(error)
+                    reject(new Error("checkJobStateError"))
 
-        } catch (error) {
-            console.log(error);
-        }
-
-
-
-    };
-
-//Maybe UNUSED
-    async getJobState(jobID) {
-
-        var jsonDataObj = {
-            'jsonrpc': '2.0',
-            'id': '1',
-            'method': 'get_workflow_progress',
-            'params': [{'job_id': jobID}]
-        };
-
-        try {
-
-            var response = await axios.post(URL, jsonDataObj, RPC_HEADER);
-
-            return response.data.result;
-
-
-        } catch (error) {
-            console.log(error);
-        }
-
+                })
+        })
     }
+
 
 
     async sendJob(jsonData) {
 
-        try {
-            const response = await axios.post(URL, jsonData, RPC_HEADER);
-            console.log("Result from SendJob");
-            console.log(response.data.result);
-            return response.data.result.job_id;
-        } catch (error) {
-            console.log(error);
-        }
+        console.log("IN SENDJOB");
+        return new Promise((resolve, reject) => {
+
+            axios.post(URL, jsonData, RPC_HEADER).then(response => {
+                console.log(jsonData);
+                console.log("Result from SendJob");
+                console.log(response.data.result);
+                resolve(response.data.result.job_id);
+            })
+                .catch(error=>{
+                    console.log(error)
+                    reject(new Error("sendJobError"))
+                })
+        });
     };
 
     async pullJobs() {

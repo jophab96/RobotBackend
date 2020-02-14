@@ -15,15 +15,16 @@ var socketApi = require('../modules/socketApi');
 var io = socketApi.io;
 const port = process.env.PORT || 3030;
 io.listen(port);
+let jobsCount = 0;
+let x = 0;
+let actJob;
 
 //const io = require('socket.io')(server);
-
 
 
 httpManager = new HTTPManager();
 
 class ChimeraManager {
-
 
     constructor() {
         if (!!ChimeraManager.instance) {
@@ -46,49 +47,80 @@ class ChimeraManager {
     //Playplaylist, sends Play Object to HTTPManager, Polling until finished
     async playPlayList() {
 
-        //count Jobs
-
-        let jobsCount = 0;
-        for (let playJob of this.playList) {
-            jobsCount++;
-        }
-
-        for (let playJob of this.playList) {
-
-            activeJobID = await httpManager.sendJob(this.prepareJob(playJob));
-
-            while (await httpManager.checkJobState(activeJobID) == JOB_STATE_ACTIVE) {
-                console.log('Working on JOB: ' + activeJobID);
-                await this.sleep(SLEEP_INTERVALL);
-            }
-
-            workflowProgress = workflowProgress + (1/jobsCount);
-            socketApi.updateWorkflowProgress(workflowProgress);
-        }
-
-
+        this.executeJobList();
     }
+
+
+    executeJobList() {
+        if (x < this.playList.length) {
+            actJob = this.playList[x];
+            x++;
+            this.executeJob(actJob);
+        } else {
+            x = 0;
+            workflowProgress = 0;
+        }
+    }
+
+
+    async executeJob(playJob) {
+
+        httpManager.sendJob(this.prepareJob(playJob)).then(activeJobID => {
+
+            this.poll(activeJobID, 10000, 500).then(result => {
+                workflowProgress = workflowProgress + (100 / this.playList.length);
+                console.log('PROGRESS: ' + workflowProgress);
+                socketApi.updateWorkflowProgress(workflowProgress);
+
+                this.executeJobList();
+
+            });
+        });
+    }
+
+
+    poll(activeJobID, timeout, interval) {
+        var endTime = Number(new Date()) + (timeout || 2000);
+        interval = interval || 100;
+
+        var checkCondition = function (resolve, reject) {
+
+            httpManager.checkJobState(activeJobID).then(function (response) {
+                // If the condition is met, we're done!
+                if (response != JOB_STATE_ACTIVE) {
+                    resolve(response);
+                } else if (Number(new Date()) < endTime) {
+                    setTimeout(checkCondition, interval, resolve, reject);
+                } else {
+                    reject(new Error('timed out '));
+                }
+            });
+        };
+
+        return new Promise(checkCondition);
+    }
+
 
     async getAvailableJobs() {
 
         return await httpManager.pullJobs();
     }
 
-    //Mocks Arm Position
+//Mocks Arm Position
     async getArmPosition() {
 
         var armPosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return armPosition;
     }
 
-    //Mocks Base Position
+//Mocks Base Position
     async getBasePosition() {
 
         var basePosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return basePosition;
     }
 
-    getWorkflowProgress(){
+    getWorkflowProgress() {
 
         return workflowProgress;
     }
