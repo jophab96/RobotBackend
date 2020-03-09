@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+var cors = require('cors');
+var CONFIG = require('./config/routingConfig');
+
 
 var indexRouter = require('./routes/index');
 var playWorkflowRouter = require('./routes/playWorkflow');
@@ -18,6 +21,8 @@ var RobotDataServiceRouter = require('./routes/RobotDataService');
 
 var app = express();
 
+app.use(cors());
+app.options('*', cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,37 +44,11 @@ app.use('/RobotDataService', RobotDataServiceRouter);
 app.use('/CSComm', csComm);
 
 
-/*=======================Sockets Part===========
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
 
-const port = process.env.PORT || 3030;
-
-io.on('connection', (socket) => {
-    console.log('user connected');
-
-    socket.on('new-message', (message) => {
-        console.log("NEW MSG REC");
-        console.log(message);
-    });
-
-    socket.on('send mess', (obj) => {
-        console.log(obj);
-        io.sockets.emit('add mess', obj);
-    })
-});
-
-
-server.listen(port, () => {
-    console.log(`started on port: ${port}`);
-});
-
-==================*/
-/*=======================Sockets End=============================*/
 
 
 //MONGOOSE
-mongoose.connect('mongodb://localhost/mongo');
+mongoose.connect(CONFIG.mongooseConnect);
 
 mongoose.model('methods', {name: String});
 

@@ -5,7 +5,6 @@ var socketApi = {};
 socketApi.io = io;
 
 io.on('connection', (socket) => {
-    console.log('user connected');
 
     socket.on('new-message', (message) => {
         console.log("NEW MSG REC");

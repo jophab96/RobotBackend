@@ -1,0 +1,8 @@
+{
+
+  "mongooseConnect" : "mongodb://localhost/mongo",
+  "chimeraURL" : "http://localhost:4000",
+  "socketPort" : 3030,
+  "user": "intern",
+  "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2JvdElkIjoiY2hpbWVyYTEiLCJleHBpcmVzIjozMTUzNjAwMH0.fPubN5HhuKhmg0o8gL5NA7TCNbtLdL6FxkG_B8A3U1s"
+}

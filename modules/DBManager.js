@@ -30,7 +30,11 @@ var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
 
 class DBManager {
 
-
+    /**
+     * Constructor for the Database Manager.
+     * @constructor
+     * @return {DBManager} Instance of the DBManager - Singleton.
+     */
     constructor() {
         if (!!DBManager.instance) {
             return DBManager.instance;
@@ -41,13 +45,21 @@ class DBManager {
         return this;
     }
 
-
+    /**
+     * Opens the DB Manager.
+     */
     open() {
         this.workflow = null;
 
         console.log('Opened the DBManager');
 
     }
+
+    /**
+     * Reads jobid of every job in the array und creates a array with all the jobs and their detailed information in it.
+     * @param {Job[]} jobs  Array of Jobs without detailed job information
+     * @return {Job[]} Array of Jobs with detailed job information
+     */
 
     async createJobList(jobs) {
 
@@ -58,7 +70,6 @@ class DBManager {
             var dbJob = await this.findOneJob(mongoose.Types.ObjectId(job._id_job_fk));
 
             switch (dbJob.job_type) {
-
 
                 case (GRIPPER_GRIP_NAME):
 
@@ -97,6 +108,12 @@ class DBManager {
 
     }
 
+    /**
+     * Reads workflow out of the Database and creates an array of all jobs with detailed job information.
+     * @param {mongoose.Types.ObjectId} id ID of the workflow
+     * @return {Job[]}  Array of Jobs with detailed job information
+     */
+
     async createPlayList(id) {
 
 
@@ -108,8 +125,10 @@ class DBManager {
 
         for (let job of playWorkflow.jobs) {
             //Grab out the detailed Job of the DB
+            console.log(' WORKING ON JOB');
+            console.log(job);
             playJob = await this.findOneJob(mongoose.Types.ObjectId(job._id_job_fk));
-            console.log('playjob');
+            console.log('THIS IS PLAYJOB PROMISE');
             console.log(playJob);
             playList.push(playJob);
         }
@@ -121,13 +140,19 @@ class DBManager {
 
     }
 
-    //Input: ID, Output: Workflow with Input ID
+    /**
+     * Reads workflow out of the Database.
+     * @param {mongoose.Types.ObjectId} id ID of the workflow
+     * @return {Workflow}  Workflow with specified ID.
+     */
+
+
     findWorkflow(workflowID) {
 
         return Workflow.findById(workflowID)
             .exec()
             .then(workflow => {
-                console.log('Logging WF');
+                console.log('This is from findWorkflow');
                 console.log(workflow);
                 return workflow;
             })
@@ -136,7 +161,10 @@ class DBManager {
 
     }
 
-    //Output: All Workflows
+    /**
+     * Reads all workflows out of the Database.
+     * @return {Workflow[]}  Array of all workflows.
+     */
     findAllWorkflows() {
 
         return Workflow.find()
@@ -149,14 +177,19 @@ class DBManager {
 
     }
 
-    //Finds one Workflow but Output Mapping is different
+    /**
+     * Reads workflow out of the Database.
+     * @param {mongoose.Types.ObjectId} id ID of the workflow
+     * @return {Workflow}  Workflow in a different Format.
+     */
     async findOneMappedWorkflow(id) {
 
-    var workFlowID = mongoose.Types.ObjectId(id);
+        var workFlowID = mongoose.Types.ObjectId(id);
 
         return Workflow.findById(workFlowID)
             .exec()
             .then(workflow => {
+                console.log("THIS IS FROM DB/findWorkflowByID");
                 console.log(workflow);
 
                 //Some Mapping
@@ -173,8 +206,12 @@ class DBManager {
 
     }
 
-    //Finds one Job
-    findOneJob(id) {
+    /**
+     * Reads job out of the Database.
+     * @param {mongoose.Types.ObjectId} id ID of the job
+     * @return {Workflow}  Job with specified ID.
+     *
+     */    findOneJob(id) {
 
         var jobID = mongoose.Types.ObjectId(id);
 
@@ -190,7 +227,11 @@ class DBManager {
 
     };
 
-    //Deletes all Jobs from Workflow, holds old Workflow, add Jobs of new Workflow (WF ID is the same)
+    /**
+     * Updates an specified Workflow.
+     * @param {Workflow} updatedWorkflow the updated Workflow that should replace the old one.
+     *
+     */
     async updateWorkflow(inputWorkflow) {
 
         this.workflow = await this.findWorkflow(inputWorkflow._id);
@@ -214,7 +255,11 @@ class DBManager {
 
     }
 
-    //Deletes Workflow from DB
+    /**
+     * Deletes all jobs of an specified Workflow.
+     * @param {mongoose.Types.ObjectId} id ID of the workflow
+     *
+     */
     deleteWorkflow(workflowID) {
 
         Workflow.remove({_id: workflowID}, function (err) {
@@ -226,7 +271,12 @@ class DBManager {
         });
     }
 
-    //Delete all Workflows AND Jobs,  for Cleaning up DB
+
+
+    /**
+     * Deletes all workflows and jobs. Cleans the DB.
+     */
+
     deleteAllWorkflows() {
 
         Workflow.remove({}, function (err) {
@@ -238,7 +288,11 @@ class DBManager {
         });
     }
 
-    //Input: JOB FK ID, deletes all Jobs from an Spec Workflow
+    /**
+     * Deletes all jobs of an given workflow.
+     * @param {Workflow} Workflow the workflow..
+     *
+     */
     deleteJobs(workflow) {
 
         for (let job of workflow.jobs) {
@@ -254,7 +308,11 @@ class DBManager {
         }
     }
 
-    //Input: Name of Workflow, Return WF_ID
+    /**
+     * Creates a new workflow.
+     * @param {String} Name Name of the new workflow.
+     *
+     */
     createWorkflow(name) {
 
         this.workflow = new Workflow({
@@ -268,7 +326,13 @@ class DBManager {
         return this.workflow._id;
     }
 
-    //adds Jobs to actual Processes Workflow (NAME: workflow)
+    /**
+     * Add jobs to the actual processed workflow. In this Method the DBManager assigns the right DB schema to each signle Job.
+     * In the case of an extension or in the case of adding new function to this project, you have to add the new Job Types here.
+     * @param {Job[]} Jobs Array of Jobs.
+     * @return {mongoose.Types.ObjectId} ID of the processed workflow.
+     *
+     */
     addJobs(inputJobs) {
 
         var processingJob;
@@ -324,6 +388,7 @@ class DBManager {
 
             processingJob.save().then(result => {
 
+                console.log("JOB IS IN THE DB NOW")
                 console.log(result);
                 return result._id;
             });

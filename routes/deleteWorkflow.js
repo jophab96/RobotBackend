@@ -11,7 +11,7 @@ router.post('/deleteOne', function (req, res, next) {
 
     workflowID = req.body.wf_id;
     dataBaseManager.deleteWorkflow(workflowID);
-    result.wf_id = wfId;
+    result.wf_id = workflowID;
 
     res.send(result);
 

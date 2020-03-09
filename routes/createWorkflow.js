@@ -10,6 +10,7 @@ let inputWorkflow;
 router.post('/', async function (req, res, next) {
 
     inputWorkflow = req.body.jsondata;
+    console.log(inputWorkflow);
     dataBaseManager.open();
     processingWorkflowID =dataBaseManager.createWorkflow(inputWorkflow._name);
     dataBaseManager.addJobs(inputWorkflow._jobsObjects);

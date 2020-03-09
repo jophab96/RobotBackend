@@ -35,7 +35,7 @@ router.post('/readOne', async function (req, res, next) {
     let detailedJobs = await dataBaseManager.createJobList(workflow._jobsObjects);
     //Push Job Details into Workflow
     workflow._jobsObjects = detailedJobs;
-    //Send Result
+
     res.send(workflow);
 
 

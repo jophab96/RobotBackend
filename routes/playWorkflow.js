@@ -11,15 +11,17 @@ let workflowID;
 let playList;
 let result = new Object();
 
+/** This is a description of the foo function. */
+
 /* POST methods listing. */
 router.post('/', async function (req, res, next) {
 
 
     workflowID = req.body.wf_id;
-    playList = await dataBaseManager.createPlayList(workflowID);
+    workflow = await dataBaseManager.createPlayList(workflowID);
 
-    chimeraMng.setPlayList(playList);
-    chimeraMng.playPlayList();
+    chimeraMng.setWorkflow(workflow);
+    chimeraMng.executeWorkflow();
 
     result.wf_id = workflowID;
     res.send(result);

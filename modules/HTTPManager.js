@@ -1,6 +1,5 @@
 const axios = require('axios');
-
-//const Definitions = require('../bin/definitions').Definitions;
+var CONFIG = require('../config/routingConfig');
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
@@ -12,13 +11,14 @@ var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
 var MOVE_BASE_RPC_NAME = 'trigger_move_base';
 var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
 
+
 var RPC_HEADER = {
     headers: {
-        'user': 'intern',
-        'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2JvdElkIjoiY2hpbWVyYTEiLCJleHBpcmVzIjozMTUzNjAwMH0.fPubN5HhuKhmg0o8gL5NA7TCNbtLdL6FxkG_B8A3U1s'
+        'user': CONFIG.user,
+        'token': CONFIG.token
     }
 };
-var URL = 'http://localhost:4000';
+var URL = CONFIG.chimeraURL;
 
 
 var response;
@@ -64,7 +64,6 @@ class HTTPManager {
     }
 
 
-
     async sendJob(jsonData) {
 
         console.log("IN SENDJOB");
@@ -73,6 +72,7 @@ class HTTPManager {
             axios.post(URL, jsonData, RPC_HEADER).then(response => {
                 console.log(jsonData);
                 console.log("Result from SendJob");
+                console.log(response);
                 console.log(response.data.result);
                 resolve(response.data.result.job_id);
             })
@@ -98,6 +98,9 @@ class HTTPManager {
             console.log("Result from pullJobs");
             console.log(response.data.result);
             return response.data.result;
+
+
+
         } catch (error) {
             console.log(error);
         }

@@ -1,4 +1,5 @@
 var HTTPManager = require('../modules/HTTPManager').HTTPManager;
+var CONFIG = require('../config/routingConfig');
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
@@ -13,9 +14,8 @@ var workflowProgress = 0;
 
 var socketApi = require('../modules/socketApi');
 var io = socketApi.io;
-const port = process.env.PORT || 3030;
+const port = process.env.PORT || CONFIG.socketPort;
 io.listen(port);
-let jobsCount = 0;
 let x = 0;
 let actJob;
 
@@ -37,23 +37,17 @@ class ChimeraManager {
 
     //Sets Playlist
 
-    setPlayList(playList) {
+    setWorkflow(workflow) {
 
-        this.playList = playList;
+        this.worklfow = workflow;
 
     }
 
-    //Spinner HERE!
     //Playplaylist, sends Play Object to HTTPManager, Polling until finished
-    async playPlayList() {
 
-        this.executeJobList();
-    }
-
-
-    executeJobList() {
-        if (x < this.playList.length) {
-            actJob = this.playList[x];
+    executeWorkflow() {
+        if (x < this.worklfow.length) {
+            actJob = this.worklfow[x];
             x++;
             this.executeJob(actJob);
         } else {
@@ -67,26 +61,25 @@ class ChimeraManager {
 
         httpManager.sendJob(this.prepareJob(playJob)).then(activeJobID => {
 
-            this.poll(activeJobID, 10000, 500).then(result => {
-                workflowProgress = workflowProgress + (100 / this.playList.length);
+            this.pollingJobState(activeJobID, 10000, 500).then(result => {
+                workflowProgress = workflowProgress + (100 / this.worklfow.length);
                 console.log('PROGRESS: ' + workflowProgress);
                 socketApi.updateWorkflowProgress(workflowProgress);
 
-                this.executeJobList();
+                this.executeWorkflow();
 
             });
         });
     }
 
 
-    poll(activeJobID, timeout, interval) {
+    pollingJobState(activeJobID, timeout, interval) {
         var endTime = Number(new Date()) + (timeout || 2000);
         interval = interval || 100;
 
         var checkCondition = function (resolve, reject) {
 
             httpManager.checkJobState(activeJobID).then(function (response) {
-                // If the condition is met, we're done!
                 if (response != JOB_STATE_ACTIVE) {
                     resolve(response);
                 } else if (Number(new Date()) < endTime) {
@@ -103,7 +96,20 @@ class ChimeraManager {
 
     async getAvailableJobs() {
 
-        return await httpManager.pullJobs();
+
+        var availableJobs = {
+            'workflows': ['GripperGripWorkflow',
+                'MoveArmCartesianWorkflow',
+                'GripperReleaseWorkflow']
+        };
+
+        //this.availabeJobs = await httpManager.pullJobs();
+        //delete this.availabeJobs[2];
+        console.log(availableJobs);
+        return availableJobs;
+
+
+        //return await httpManager.pullJobs();
     }
 
 //Mocks Arm Position
