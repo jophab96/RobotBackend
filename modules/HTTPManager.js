@@ -24,8 +24,14 @@ var URL = CONFIG.chimeraURL;
 var response;
 
 
+
 class HTTPManager {
 
+    /**
+     * Constructor for the HTTP Manager.
+     * @constructor
+     * @return {HTTPManager} Instance of the HTTPManager - Singleton.
+     */
 
     constructor() {
         if (!!HTTPManager.instance) {
@@ -36,9 +42,15 @@ class HTTPManager {
         return this;
     }
 
+
+    /**
+     * Checks jobstate of the actual processed job.
+     * @param {mongoose.Types.ObjectId} id ID of the processed Job
+     * @return {String}  String of the actual job state.
+     */
+
     //Request Job State from Chimera (active, done, canceled, etc..)
     async checkJobState(jobID) {
-        console.log("IN CHECK JOB 1");
 
         var jsonDataObj = {
             'jsonrpc': '2.0',
@@ -50,8 +62,7 @@ class HTTPManager {
         return new Promise((resolve, reject) => {
 
             axios.post(URL, jsonDataObj, RPC_HEADER).then(response => {
-                console.log("Check Job State from Job ID: " + jobID);
-                console.log(response.data.result);
+
                 resolve(response.data.result.job_state);
 
             })
@@ -63,17 +74,18 @@ class HTTPManager {
         })
     }
 
+    /**
+     * Sends one Job to  Chimera.
+     * @param {mongoose.Types.ObjectId} id ID of the processed Job
+     * @return {String}  String of the actual Job State.
+     */
 
     async sendJob(jsonData) {
 
-        console.log("IN SENDJOB");
         return new Promise((resolve, reject) => {
 
             axios.post(URL, jsonData, RPC_HEADER).then(response => {
-                console.log(jsonData);
-                console.log("Result from SendJob");
-                console.log(response);
-                console.log(response.data.result);
+
                 resolve(response.data.result.job_id);
             })
                 .catch(error=>{
@@ -95,10 +107,8 @@ class HTTPManager {
 
         try {
             const response = await axios.post(URL, preparedRequest, RPC_HEADER);
-            console.log("Result from pullJobs");
-            console.log(response.data.result);
-            return response.data.result;
 
+            return response.data.result;
 
 
         } catch (error) {

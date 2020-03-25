@@ -7,6 +7,11 @@ var DBManager = require('../modules/DBManager').DBManager;
 const dataBaseManager = new DBManager();
 
 
+/** @module readWorkflow */
+
+
+
+
 function formatWorkflows(workflows) {
 
     var wf_list = [];
@@ -20,12 +25,27 @@ function formatWorkflows(workflows) {
     return wf_list;
 }
 
-router.post('/findOneJob', async function (req, res, next) {
+/** @function /findOneJob (POST)
+ * API Call to find one Job.
+ * @param {Request} req - Input from Frontend which includes job id.
+ * @param {Response} res -
+
+ */
+
+router.post('/findOneJob', async function (req, res) {
 
     res.send(await dataBaseManager.findOneJob());
 
 
 });
+
+/** @function /readOne (POST)
+ * API Call to find and return one Job.
+ * @param {Request} req - Input from Frontend which includes job id.
+ * @param {Response} res -
+
+ */
+
 
 router.post('/readOne', async function (req, res, next) {
 

@@ -7,6 +7,8 @@ const dataBaseManager = new DBManager();
 let result = new Object();
 let inputWorkflow;
 
+/** @module routes/updateWorkflow */
+
 
 router.post('/', async function (req, res, next) {
 

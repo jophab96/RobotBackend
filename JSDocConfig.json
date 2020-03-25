@@ -1,0 +1,15 @@
+{
+  "source": {
+    "include": ["./modules/DBManager.js",
+      "./modules/ChimeraManager.js",
+      "./modules/HTTPManager.js",
+      "./modules/socketApi.js",
+      "./routes/readWorkflow.js",
+      "./routes/createWorkflow.js",
+      "./routes/deleteWorkflow.js",
+      "./routes/updateWorkflow.js",
+      "./routes/RobotDataService.js"
+
+    ]
+  }
+}

@@ -4,6 +4,12 @@ var socketApi = {};
 
 socketApi.io = io;
 
+
+/**
+ * Socket Module for creating a workflow.
+ * @module socketApi
+ */
+
 io.on('connection', (socket) => {
 
     socket.on('new-message', (message) => {

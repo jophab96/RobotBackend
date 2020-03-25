@@ -8,8 +8,6 @@ var MOVE_ARM_CARTESIAN_NAME = 'ArmCartesian';
 
 var JOB_STATE_ACTIVE = 'active';
 
-var SLEEP_INTERVALL = 500;
-var activeJobID;
 var workflowProgress = 0;
 
 var socketApi = require('../modules/socketApi');
@@ -19,12 +17,16 @@ io.listen(port);
 let x = 0;
 let actJob;
 
-//const io = require('socket.io')(server);
-
 
 httpManager = new HTTPManager();
 
 class ChimeraManager {
+
+    /**
+     * Constructor for the Chimera Manager.
+     * @constructor
+     * @return {ChimeraManager} Instance of the ChimeraManager - Singleton.
+     */
 
     constructor() {
         if (!!ChimeraManager.instance) {
@@ -35,7 +37,10 @@ class ChimeraManager {
         return this;
     }
 
-    //Sets Playlist
+    /**
+     * Sets the workflow to play
+     * @param {workflow} workflow
+     */
 
     setWorkflow(workflow) {
 
@@ -43,7 +48,13 @@ class ChimeraManager {
 
     }
 
-    //Playplaylist, sends Play Object to HTTPManager, Polling until finished
+    /**
+     * Executes the workflow which was set by the {@link ChimeraManager#setWorkflow|setWorkflow} Method.
+     * Each job of the workflow is executed by the {@link ChimeraManager#executeJob|executeJob} Method.
+     * @param {none} none
+
+     */
+
 
     executeWorkflow() {
         if (x < this.worklfow.length) {
@@ -56,14 +67,22 @@ class ChimeraManager {
         }
     }
 
+    /**
+     * Executes one given job.
+     * The job is send to Chimera via the {@link HTTPManager#sendJob|sendJob} Method.
+     * After that, the  {@link ChimeraManager#pollingJobState|pollingJobState} Method is called.
+     * If the Job is finished, the workflowProgress value gets updated.
+     * @param {Job} playJob
+
+     */
 
     async executeJob(playJob) {
 
         httpManager.sendJob(this.prepareJob(playJob)).then(activeJobID => {
 
             this.pollingJobState(activeJobID, 10000, 500).then(result => {
+
                 workflowProgress = workflowProgress + (100 / this.worklfow.length);
-                console.log('PROGRESS: ' + workflowProgress);
                 socketApi.updateWorkflowProgress(workflowProgress);
 
                 this.executeWorkflow();
@@ -72,7 +91,15 @@ class ChimeraManager {
         });
     }
 
-
+    /**
+     * Check the state of an actual processed job.
+     * A job state request is send to Chimera via {@link HTTPManager#checkJobState|checkJobState} Method.
+     * After that, a Promise is returned.
+     * @param {mongoose.Types.ObjectId} activeJobID
+     * @param {Integer} timeout
+     * @param {Integer} interval
+     * @return {Promise} new Promise
+     */
     pollingJobState(activeJobID, timeout, interval) {
         var endTime = Number(new Date()) + (timeout || 2000);
         interval = interval || 100;

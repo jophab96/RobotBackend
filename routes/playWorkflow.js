@@ -11,7 +11,7 @@ let workflowID;
 let playList;
 let result = new Object();
 
-/** This is a description of the foo function. */
+/** @module routes/playWorkflow */
 
 /* POST methods listing. */
 router.post('/', async function (req, res, next) {

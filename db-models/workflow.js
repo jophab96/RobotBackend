@@ -2,9 +2,6 @@ var mongoose = require('mongoose');
 const { Model, Schema } = mongoose;
 var request = require('request');
 
-
-
-
 var workflowSchema = new Schema({
     _id: mongoose.Types.ObjectId,
     name: { type: String, default: 'MyCustomName' },
@@ -19,12 +16,6 @@ var workflowSchema = new Schema({
 });
 
 class WorkFlow extends Model {
-
-
-
-
-
-
 
 }
 

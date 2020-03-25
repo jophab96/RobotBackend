@@ -7,7 +7,19 @@ const dataBaseManager = new DBManager();
 let workflowID;
 let result = new Object();
 
-router.post('/deleteOne', function (req, res, next) {
+/**
+ * API Module for creating a workflow.
+ * @module deleteWorkflow
+ */
+
+/** @function /deleteOne (POST)
+ * API Call to delete one workflow.
+ * @param {Request} req - Input from Frontend which includes workflow id.
+ * @param {Response} res -
+
+ */
+
+router.post('/deleteOne', function (req, res) {
 
     workflowID = req.body.wf_id;
     dataBaseManager.deleteWorkflow(workflowID);
@@ -17,19 +29,21 @@ router.post('/deleteOne', function (req, res, next) {
 
 });
 
-router.post('/deleteAll', async function (req, res, next) {
+/** @function /deleteAll (POST)
+ * API Call to delete all workflows.
+ * @param {Request} req - Input from Frontend which includes workflow id.
+ * @param {Response} res -
+
+ */
+
+router.post('/deleteAll', async function (req, res) {
 
     dataBaseManager.deleteAllWorkflows();
     res.send('ok');
 
 });
 
-router.get('/', function (req, res, next) {
 
-    printAllWorkflows();
-    res.send('OK');
-
-});
 
 
 module.exports = router;

@@ -3,14 +3,6 @@ var mongoose = require('mongoose');
 
 const Workflow = require('../db-models/workflow');
 
-/**
- const IJob = require('../models/IJob');
- const Job_GripperGrip = require('../models/IJob');
- const Job_GripperRelease = require('../models/IJob');
- const Job_MoveBase = require('../models/IJob');
- const Job_MoveArmCartesian = require('../models/IJob');
-
- **/
 const IJob = require('../db-models/IJob');
 const Job_GripperGrip = require('../db-models/GripperGripJob');
 const Job_GripperRelease = require('../db-models/GripperReleaseJob');
@@ -116,25 +108,16 @@ class DBManager {
 
     async createPlayList(id) {
 
-
         var workflowID = mongoose.Types.ObjectId(id);
         var playWorkflow = await this.findWorkflow(workflowID);
         var playJob;
         var playList = [];
 
-
         for (let job of playWorkflow.jobs) {
             //Grab out the detailed Job of the DB
-            console.log(' WORKING ON JOB');
-            console.log(job);
             playJob = await this.findOneJob(mongoose.Types.ObjectId(job._id_job_fk));
-            console.log('THIS IS PLAYJOB PROMISE');
-            console.log(playJob);
             playList.push(playJob);
         }
-
-
-        console.log(playList);
 
         return playList;
 
@@ -152,13 +135,9 @@ class DBManager {
         return Workflow.findById(workflowID)
             .exec()
             .then(workflow => {
-                console.log('This is from findWorkflow');
-                console.log(workflow);
                 return workflow;
             })
             .catch();
-
-
     }
 
     /**
@@ -171,10 +150,8 @@ class DBManager {
             .exec()
             .then(doc => {
                 return doc;
-
             })
             .catch();
-
     }
 
     /**
@@ -189,9 +166,6 @@ class DBManager {
         return Workflow.findById(workFlowID)
             .exec()
             .then(workflow => {
-                console.log("THIS IS FROM DB/findWorkflowByID");
-                console.log(workflow);
-
                 //Some Mapping
                 var wf = {
                     _id: workflow._id,
@@ -211,7 +185,8 @@ class DBManager {
      * @param {mongoose.Types.ObjectId} id ID of the job
      * @return {Workflow}  Job with specified ID.
      *
-     */    findOneJob(id) {
+     */
+    findOneJob(id) {
 
         var jobID = mongoose.Types.ObjectId(id);
 
@@ -320,9 +295,6 @@ class DBManager {
             name: name,
         });
 
-        console.log('Created Workflow in DBM');
-        console.log(this.workflow._id);
-
         return this.workflow._id;
     }
 
@@ -338,8 +310,6 @@ class DBManager {
         var processingJob;
 
         for (let job of inputJobs) {
-
-            console.log(job._name);
             switch (job._name) {
 
                 case (GRIPPER_GRIP_NAME):
@@ -388,8 +358,6 @@ class DBManager {
 
             processingJob.save().then(result => {
 
-                console.log("JOB IS IN THE DB NOW")
-                console.log(result);
                 return result._id;
             });
         }

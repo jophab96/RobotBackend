@@ -6,7 +6,10 @@ var ChimeraManager = require('../modules/ChimeraManager').ChimeraManager;
 const chimeraMng = new ChimeraManager();
 
 
-/* POST methods listing. */
+
+/** @module routes/RobotDataService */
+
+
 router.post('/getAvailableJobs', async function (req, res, next) {
 
 
