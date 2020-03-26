@@ -11,6 +11,11 @@ const dataBaseManager = new DBManager();
 
 
 
+/** @function formatWorkflows
+ * Method to format a list of workflows.
+ * @param {List<workflow>} workflows - list of workflows
+ * @return {List<workflow>} wf_list - formated list of workflows
+ */
 
 function formatWorkflows(workflows) {
 
@@ -26,7 +31,7 @@ function formatWorkflows(workflows) {
 }
 
 /** @function /findOneJob (POST)
- * API Call to find one Job.
+ * API Call to find one job.
  * @param {Request} req - Input from Frontend which includes job id.
  * @param {Response} res -
 
@@ -39,15 +44,8 @@ router.post('/findOneJob', async function (req, res) {
 
 });
 
-/** @function /readOne (POST)
- * API Call to find and return one Job.
- * @param {Request} req - Input from Frontend which includes job id.
- * @param {Response} res -
 
- */
-
-
-router.post('/readOne', async function (req, res, next) {
+router.post('/readOne', async function (req, res) {
 
     //Get Workflow out of DB (Key : wf:id)
     let workflow = await dataBaseManager.findOneMappedWorkflow(req.body.wf_id);
@@ -61,7 +59,14 @@ router.post('/readOne', async function (req, res, next) {
 
 });
 
-router.post('/readAll', async function (req, res, next) {
+/** @function /readAll (POST)
+ * API Call to return all workflows
+ * @param {Request} req - Input from client
+ * @param {Response<workflow>} res - Response which inclues a list of workflows
+
+ */
+
+router.post('/readAll', async function (req, res ) {
 
 
     //Grab all WFs out of DB
@@ -74,7 +79,15 @@ router.post('/readAll', async function (req, res, next) {
 
 });
 
-router.post('/readOneJob', async function (req, res, next) {
+/** @function /readOneJob (POST)
+ * API Call to return one specific job
+ * @param {Request<jobID>} req - Input from client which includes job id
+ * @param {Response<job>} res - Response which inclues the requested job
+
+
+ */
+
+router.post('/readOneJob', async function (req, res) {
 
     //Grab one Job out of DB
     let job = await dataBaseManager.findOneJob(req.body.job_id);
@@ -83,6 +96,8 @@ router.post('/readOneJob', async function (req, res, next) {
 
 
 });
+
+
 
 router.post('/', async function (req, res, next) {
 

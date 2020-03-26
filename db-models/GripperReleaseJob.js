@@ -3,7 +3,22 @@ const extendSchema = require('mongoose-extend-schema');
 const JobSchema = require('./IJob');
 
 
+/**
+ * Mongoose Schema for all GripperRelease jobs.
+ * @module GripperReleaseJob
+ */
+
+
+
 const Base = require('./IJob'); // we have to make sure our Book schema is aware of the Base schema
+
+/**
+ * @typedef Job_GripperRelease
+ * @type {mongoose.Schema}
+ * @property {String} job_type - job type of the job
+ * @property {String} rpc_name - rpc name of the job
+ */
+
 
 const Job_GripperRelease = Base.discriminator('Job_GripperRelease', new mongoose.Schema({
     job_type: String,

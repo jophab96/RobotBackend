@@ -7,6 +7,12 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var CONFIG = require('./config/routingConfig');
 
+/**
+ * App JS Module.
+ * @module app
+ */
+
+
 
 var indexRouter = require('./routes/index');
 var playWorkflowRouter = require('./routes/playWorkflow');

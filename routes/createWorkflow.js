@@ -14,11 +14,11 @@ let inputWorkflow;
  * @module createWorkflow
  */
 
-/** @function /createWorkflow (POST)
- * API Call to create a new Workflow.
- * @param {Request} req - Input from Frontend which includes Workflow.
- * @param {Response} res -
 
+/** @function /createWorkflow (POST)
+ * API Call to start a workflow
+ * @param {Request<workflow>} req - Input from client which includes Workflow
+ * @return {Response<workflowID>} res - Response to client which includes the workflowID of the actual created workflow
  */
 
 router.post('/', async function (req, res) {

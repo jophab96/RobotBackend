@@ -14,9 +14,8 @@ let result = new Object();
 
 /** @function /deleteOne (POST)
  * API Call to delete one workflow.
- * @param {Request} req - Input from Frontend which includes workflow id.
- * @param {Response} res -
-
+ * @param {Request<workflowID>} req - Input from client which includes workflow id
+ * @return {Response<workflowID>} res - Response to client which includes the workflowID of the actual deleted workflow
  */
 
 router.post('/deleteOne', function (req, res) {
@@ -29,13 +28,14 @@ router.post('/deleteOne', function (req, res) {
 
 });
 
+
+
+
 /** @function /deleteAll (POST)
  * API Call to delete all workflows.
- * @param {Request} req - Input from Frontend which includes workflow id.
- * @param {Response} res -
-
+ * @param {Request} req - Input from client
+ * @return {Response<String>} res - Response to client
  */
-
 router.post('/deleteAll', async function (req, res) {
 
     dataBaseManager.deleteAllWorkflows();

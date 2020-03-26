@@ -7,8 +7,14 @@ const dataBaseManager = new DBManager();
 let result = new Object();
 let inputWorkflow;
 
-/** @module routes/updateWorkflow */
+/** @module updateWorkflow */
 
+/** @function /updateWorkflow (POST)
+ * API Call to update a workflow.
+ * @param {Request<workflow>} req - Input from Frontend which includes updated workflow.
+ * @return {Response<workflowID>} res - Response to client.
+
+ */
 
 router.post('/', async function (req, res, next) {
 

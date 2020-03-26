@@ -127,7 +127,8 @@ class ChimeraManager {
         var availableJobs = {
             'workflows': ['GripperGripWorkflow',
                 'MoveArmCartesianWorkflow',
-                'GripperReleaseWorkflow']
+                'GripperReleaseWorkflow',
+            'NewMethodWorkflow']
         };
 
         //this.availabeJobs = await httpManager.pullJobs();

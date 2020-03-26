@@ -7,16 +7,28 @@ const chimeraMng = new ChimeraManager();
 
 
 
-/** @module routes/RobotDataService */
+/** @module RobotDataService */
+
+/** @function /getAvailableJobs (POST)
+ * API Call to get a list of all available jobs
+ * @param {List} req - Input from Frontend
+ * @return {List<jobs>} res - list of all jobs
+ */
 
 
-router.post('/getAvailableJobs', async function (req, res, next) {
+router.post('/getAvailableJobs', async function (req, res) {
 
 
     res.send(await chimeraMng.getAvailableJobs());
 
 
 });
+
+/** @function /getArmPosition (POST)
+ * API Call to get the actual arm position
+ * @param {Request} req - Input from Client
+ * @return {Response<ArmPosition>} res - Response to client which includes the actual arm position
+ */
 
 router.post('/getArmPosition', async function (req, res, next) {
 
@@ -26,6 +38,13 @@ router.post('/getArmPosition', async function (req, res, next) {
 
 });
 
+/** @function /getBasePosition (POST)
+ * API Call to get the actual base position
+ * @param {Request} req - Input from Client
+ * @return {Response<BasePosition>} res - Response to client which includes the actual base position
+ */
+
+
 router.post('/getBasePosition', async function (req, res, next) {
 
 
@@ -34,21 +53,6 @@ router.post('/getBasePosition', async function (req, res, next) {
 
 });
 
-
-router.post('/test', async function (req, res, next) {
-
-
-    res.send('ok');
-
-
-});
-
-
-/* GET workflow listing. */
-router.get('/', function (req, res, next) {
-
-
-});
 
 
 module.exports = router;

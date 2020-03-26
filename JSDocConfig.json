@@ -6,9 +6,17 @@
       "./modules/socketApi.js",
       "./routes/readWorkflow.js",
       "./routes/createWorkflow.js",
+      "./routes/playWorkflow.js",
       "./routes/deleteWorkflow.js",
       "./routes/updateWorkflow.js",
-      "./routes/RobotDataService.js"
+      "./routes/RobotDataService.js",
+      "./db-models/IJob.js",
+      "./db-models/GripperGripJob.js",
+      "./db-models/GripperReleaseJob.js",
+      "./db-models/MoveArmCartesianJob.js",
+      "./db-models/MoveBaseJob.js",
+      "./app.js"
+
 
     ]
   }

@@ -11,14 +11,21 @@ let workflowID;
 let playList;
 let result = new Object();
 
-/** @module routes/playWorkflow */
+/** @module playWorkflow */
 
-/* POST methods listing. */
-router.post('/', async function (req, res, next) {
+
+/** @function /playWorkflow (POST)
+ * API Call to start a workflow.
+ * @param {Request<workflowID>} req - Input from Frontend which includes workflow id.
+ * @return {Response<workflowID>} res - Response to client which includes the workflowID of the actual played workflow.
+ */
+
+router.post('/', async function (req, res) {
 
 
     workflowID = req.body.wf_id;
     workflow = await dataBaseManager.createPlayList(workflowID);
+
 
     chimeraMng.setWorkflow(workflow);
     chimeraMng.executeWorkflow();
@@ -27,18 +34,15 @@ router.post('/', async function (req, res, next) {
     res.send(result);
 });
 
-/* POST methods listing. */
-router.post('/workflowProgress', async function (req, res, next) {
+/** @function /playWorkflow (POST)
+ * API Call to check the progress of the actual processed workflow.
+ * @param {Request} req - Input from Client .
+ * @return {Response<Progress>} res - Response to client which includes the progress of the actual played workflow.
+
+ */router.post('/workflowProgress', async function (req, res) {
 
     result.workflowProgress = chimeraMng.getWorkflowProgress();
     res.send(result);
-});
-
-
-/* GET workflow listing. */
-router.get('/', function (req, res, next) {
-
-
 });
 
 
