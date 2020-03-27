@@ -16,12 +16,13 @@ let inputWorkflow;
 
 
 /** @function /createWorkflow (POST)
- * API Call to start a workflow
- * @param {Request<workflow>} req - Input from client which includes Workflow
- * @return {Response<workflowID>} res - Response to client which includes the workflowID of the actual created workflow
+ * @description API Call to start a workflow
+ * @param {Request<Workflow>} req - Input from client which includes Workflow
+ * @return {Response<mongoose.Types.ObjectId>} res - Response to client which includes the workflowID of the actual created workflow
  */
 
 router.post('/', async function (req, res) {
+
 
     inputWorkflow = req.body.jsondata;
     dataBaseManager.open();

@@ -1,16 +1,6 @@
 const axios = require('axios');
 var CONFIG = require('../config/routingConfig');
 
-var GRIPPER_GRIP_NAME = 'GripperGrip';
-var GRIPPER_RELEASE_NAME = 'GripperRelease';
-var MOVE_BASE_NAME = 'BaseMove';
-var MOVE_ARM_CARTESIAN_NAME = 'ArmCartesian';
-
-var GRIPPER_GRIP_RPC_NAME = 'trigger_gripper_grip';
-var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
-var MOVE_BASE_RPC_NAME = 'trigger_move_base';
-var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
-
 
 var RPC_HEADER = {
     headers: {
@@ -30,7 +20,7 @@ class HTTPManager {
     /**
      * Constructor for the HTTP Manager.
      * @constructor
-     * @return {HTTPManager} Instance of the HTTPManager - Singleton.
+     * @return {HTTPManager} -  Instance of the HTTPManager - Singleton.
      */
 
     constructor() {
@@ -76,8 +66,8 @@ class HTTPManager {
 
     /**
      * Sends one Job to  Chimera.
-     * @param {mongoose.Types.ObjectId} id ID of the processed Job
-     * @return {String}  String of the actual Job State.
+     * @param {mongoose.Types.ObjectId} - ID of the processed Job
+     * @return {String} - String of the actual Job State.
      */
 
     async sendJob(jsonData) {
@@ -94,6 +84,12 @@ class HTTPManager {
                 })
         });
     };
+
+    /**
+     * Pulls all available jobs from Chimera
+     * @return {String[]} - Array of the actual available jobs
+     */
+
 
     async pullJobs() {
 

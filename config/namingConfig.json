@@ -1,0 +1,9 @@
+{
+
+  "GRIPPER_GRIP_NAME" : "GripperGrip",
+  "GRIPPER_RELEASE_NAME" : "GripperRelease",
+  "MOVE_BASE_NAME" : "BaseMove",
+  "MOVE_ARM_CARTESIAN_NAME" : "ArmCartesian",
+  "NEW_METHOD_NAME" : "NewMethod"
+
+}

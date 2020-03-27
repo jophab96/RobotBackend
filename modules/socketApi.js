@@ -10,6 +10,8 @@ socketApi.io = io;
  * @module socketApi
  */
 
+
+
 io.on('connection', (socket) => {
 
     socket.on('new-message', (message) => {
@@ -18,12 +20,18 @@ io.on('connection', (socket) => {
     });
 
 });
+
+
 socketApi.sendNotification = function () {
     io.sockets.send(75);
 
 }
-socketApi.updateWorkflowProgress = function (progress) {
-    io.sockets.send(progress);
+/** @function updateWorkflowProgress
+ * @description Socket Method to push the actual workflowProgress to the client.
+ * @param {Number} workflowProgress - actual progress
+ */
+socketApi.updateWorkflowProgress = function (workflowProgress) {
+    io.sockets.send(workflowProgress);
 
 }
 

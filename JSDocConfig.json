@@ -15,6 +15,7 @@
       "./db-models/GripperReleaseJob.js",
       "./db-models/MoveArmCartesianJob.js",
       "./db-models/MoveBaseJob.js",
+      "./db-models/NewMethodJob.js",
       "./app.js"
 
 

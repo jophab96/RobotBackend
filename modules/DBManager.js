@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-//const Definitions = require('../bin/definitions').Definitions;
+var NAMING = require('../config/namingConfig');
 
 const Workflow = require('../db-models/workflow');
 
@@ -8,24 +8,16 @@ const Job_GripperGrip = require('../db-models/GripperGripJob');
 const Job_GripperRelease = require('../db-models/GripperReleaseJob');
 const Job_MoveBase = require('../db-models/MoveBaseJob');
 const Job_MoveArmCartesian = require('../db-models/MoveArmCartesianJob');
+const Job_NewMethod = require('../db-models/NewMethodJob');
 
 
-var GRIPPER_GRIP_NAME = 'GripperGrip';
-var GRIPPER_RELEASE_NAME = 'GripperRelease';
-var MOVE_BASE_NAME = 'BaseMove';
-var MOVE_ARM_CARTESIAN_NAME = 'ArmCartesian';
-
-var GRIPPER_GRIP_RPC_NAME = 'trigger_gripper_grip';
-var GRIPPER_RELEASE_RPC_NAME = 'trigger_gripper_release';
-var MOVE_BASE_RPC_NAME = 'trigger_move_base';
-var MOVE_ARM_CARTESIAN_RPC_NAME = 'trigger_move_arm_cartesian';
 
 class DBManager {
 
     /**
      * Constructor for the Database Manager.
      * @constructor
-     * @return {DBManager} Instance of the DBManager - Singleton.
+     * @return {DBManager} - Instance of the DBManager - Singleton.
      */
     constructor() {
         if (!!DBManager.instance) {
@@ -44,13 +36,12 @@ class DBManager {
         this.workflow = null;
 
         console.log('Opened the DBManager');
-
     }
 
     /**
      * Reads jobid of every job in the array und creates a array with all the jobs and their detailed information in it.
-     * @param {Job[]} jobs  Array of Jobs without detailed job information
-     * @return {Job[]} Array of Jobs with detailed job information
+     * @param {Job[]} - jobs  Array of Jobs without detailed job information
+     * @return {Job[]} - Array of Jobs with detailed job information
      */
 
     async createJobList(jobs) {
@@ -63,18 +54,18 @@ class DBManager {
 
             switch (dbJob.job_type) {
 
-                case (GRIPPER_GRIP_NAME):
+                case (NAMING.GRIPPER_GRIP_NAME):
 
                     var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
                     j.push(listjob);
                     break;
 
-                case (GRIPPER_RELEASE_NAME):
+                case (NAMING.GRIPPER_RELEASE_NAME):
                     var listjob = {_id: dbJob._id, _name: dbJob.job_type, _activationTimeout: dbJob.activationTimeout};
                     j.push(listjob);
                     break;
 
-                case (MOVE_BASE_NAME):
+                case (NAMING.MOVE_BASE_NAME):
                     var listjob = {
                         _id: dbJob._id,
                         _name: dbJob.job_type,
@@ -84,7 +75,17 @@ class DBManager {
                     j.push(listjob);
                     break;
 
-                case (MOVE_ARM_CARTESIAN_NAME):
+                case (NAMING.MOVE_ARM_CARTESIAN_NAME):
+                    var listjob = {
+                        _id: dbJob._id,
+                        _name: dbJob.job_type,
+                        _activationTimeout: dbJob.activationTimeout,
+                        _goalPose: dbJob.goalPose
+                    };
+                    j.push(listjob);
+                    break;
+
+                case (NAMING.NEW_METHOD_NAME):
                     var listjob = {
                         _id: dbJob._id,
                         _name: dbJob.job_type,
@@ -97,13 +98,12 @@ class DBManager {
         }
 
         return j;
-
     }
 
     /**
      * Reads workflow out of the Database and creates an array of all jobs with detailed job information.
-     * @param {mongoose.Types.ObjectId} id ID of the workflow
-     * @return {Job[]}  Array of Jobs with detailed job information
+     * @param {mongoose.Types.ObjectId} - ID of the workflow
+     * @return {Job[]} - Array of Jobs with detailed job information
      */
 
     async createPlayList(id) {
@@ -114,19 +114,17 @@ class DBManager {
         var playList = [];
 
         for (let job of playWorkflow.jobs) {
-            //Grab out the detailed Job of the DB
             playJob = await this.findOneJob(mongoose.Types.ObjectId(job._id_job_fk));
             playList.push(playJob);
         }
-
         return playList;
 
     }
 
     /**
      * Reads workflow out of the Database.
-     * @param {mongoose.Types.ObjectId} id ID of the workflow
-     * @return {Workflow}  Workflow with specified ID.
+     * @param {mongoose.Types.ObjectId} - ID of the workflow
+     * @return {Workflow} - Workflow with specified ID.
      */
 
 
@@ -142,7 +140,7 @@ class DBManager {
 
     /**
      * Reads all workflows out of the Database.
-     * @return {Workflow[]}  Array of all workflows.
+     * @return {Workflow[]} - Array of all workflows.
      */
     findAllWorkflows() {
 
@@ -156,8 +154,8 @@ class DBManager {
 
     /**
      * Reads workflow out of the Database.
-     * @param {mongoose.Types.ObjectId} id ID of the workflow
-     * @return {Workflow}  Workflow in a different Format.
+     * @param {mongoose.Types.ObjectId} - ID of the workflow
+     * @return {Workflow} - Workflow in a different Format.
      */
     async findOneMappedWorkflow(id) {
 
@@ -182,10 +180,10 @@ class DBManager {
 
     /**
      * Reads job out of the Database.
-     * @param {mongoose.Types.ObjectId} id ID of the job
-     * @return {Workflow}  Job with specified ID.
-     *
+     * @param {mongoose.Types.ObjectId} - ID of the job
+     * @return {Job} - Job with specified ID.
      */
+
     findOneJob(id) {
 
         var jobID = mongoose.Types.ObjectId(id);
@@ -204,7 +202,7 @@ class DBManager {
 
     /**
      * Updates an specified Workflow.
-     * @param {Workflow} updatedWorkflow the updated Workflow that should replace the old one.
+     * @param {Workflow} - the updated Workflow that should replace the old one.
      *
      */
     async updateWorkflow(inputWorkflow) {
@@ -227,12 +225,11 @@ class DBManager {
 
         //Save WF
         this.close();
-
     }
 
     /**
-     * Deletes all jobs of an specified Workflow.
-     * @param {mongoose.Types.ObjectId} id ID of the workflow
+     * Deletes one  specified workflow.
+     * @param {mongoose.Types.ObjectId} - ID of the workflow
      *
      */
     deleteWorkflow(workflowID) {
@@ -265,7 +262,7 @@ class DBManager {
 
     /**
      * Deletes all jobs of an given workflow.
-     * @param {Workflow} Workflow the workflow..
+     * @param {Workflow} - the workflow..
      *
      */
     deleteJobs(workflow) {
@@ -285,7 +282,7 @@ class DBManager {
 
     /**
      * Creates a new workflow.
-     * @param {String} Name Name of the new workflow.
+     * @param {String} - Name of the new workflow.
      *
      */
     createWorkflow(name) {
@@ -299,10 +296,10 @@ class DBManager {
     }
 
     /**
-     * Add jobs to the actual processed workflow. In this Method the DBManager assigns the right DB schema to each signle Job.
+     * Add jobs to the actual processed workflow. In this Method the DBManager assigns the right DB schema to each single Job.
      * In the case of an extension or in the case of adding new function to this project, you have to add the new Job Types here.
-     * @param {Job[]} Jobs Array of Jobs.
-     * @return {mongoose.Types.ObjectId} ID of the processed workflow.
+     * @param {Job[]} - Jobs Array of Jobs.
+     * @return {mongoose.Types.ObjectId} - ID of the processed workflow.
      *
      */
     addJobs(inputJobs) {
@@ -312,43 +309,47 @@ class DBManager {
         for (let job of inputJobs) {
             switch (job._name) {
 
-                case (GRIPPER_GRIP_NAME):
+                case (NAMING.GRIPPER_GRIP_NAME):
                     processingJob = new Job_GripperGrip({
                         _id: new mongoose.Types.ObjectId(),
-                        job_type: GRIPPER_GRIP_NAME,
+                        job_type: NAMING.GRIPPER_GRIP_NAME,
                         activationTimeout: job._activationTimeout,
-                        // rpc_name: GRIPPER_GRIP_RPC_NAME
                     });
                     break;
-                case (GRIPPER_RELEASE_NAME):
+                case (NAMING.GRIPPER_RELEASE_NAME):
                     processingJob = new Job_GripperRelease({
                         _id: new mongoose.Types.ObjectId(),
-                        job_type: GRIPPER_RELEASE_NAME,
+                        job_type: NAMING.GRIPPER_RELEASE_NAME,
                         activationTimeout: job._activationTimeout,
-                        // rpc_name: GRIPPER_RELEASE_RPC_NAME
 
                     });
                     break;
-                case (MOVE_BASE_NAME):
+                case (NAMING.MOVE_BASE_NAME):
                     processingJob = new Job_MoveBase({
                         _id: new mongoose.Types.ObjectId(),
-                        job_type: MOVE_BASE_NAME,
+                        job_type: NAMING.MOVE_BASE_NAME,
                         activationTimeout: job._activationTimeout,
                         goalPose: job._goalPose,
-                        // rpc_name: MOVE_BASE_RPC_NAME
 
                     });
                     break;
-                case (MOVE_ARM_CARTESIAN_NAME):
+                case (NAMING.MOVE_ARM_CARTESIAN_NAME):
                     processingJob = new Job_MoveArmCartesian({
                         _id: new mongoose.Types.ObjectId(),
-                        job_type: MOVE_ARM_CARTESIAN_NAME,
+                        job_type: NAMING.MOVE_ARM_CARTESIAN_NAME,
                         activationTimeout: job._activationTimeout,
                         goalPose: job._goalPose,
-                        // rpc_name: MOVE_ARM_CARTESIAN_RPC_NAME
 
                     });
                     break;
+                case (NAMING.NEW_METHOD_NAME):
+                    processingJob = new Job_NewMethod({
+                        _id: new mongoose.Types.ObjectId(),
+                        job_type: NAMING.MOVE_ARM_CARTESIAN_NAME,
+                        activationTimeout: job._activationTimeout,
+                        goalPose: job._goalPose,
+
+                    });
                 default:
                     break;
 
@@ -364,6 +365,11 @@ class DBManager {
 
     }
 
+    /**
+     * Saves the actual results.
+     * @return {mongoose.Types.ObjectId} - ID of the saved workflow.
+     *
+     */
 
     close() {
 

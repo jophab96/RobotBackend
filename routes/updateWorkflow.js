@@ -10,9 +10,9 @@ let inputWorkflow;
 /** @module updateWorkflow */
 
 /** @function /updateWorkflow (POST)
- * API Call to update a workflow.
- * @param {Request<workflow>} req - Input from Frontend which includes updated workflow.
- * @return {Response<workflowID>} res - Response to client.
+ * @description API Call to update a workflow.
+ * @param {Request<Workflow>} req - Input from Frontend which includes updated workflow.
+ * @return {Response<mongoose.Types.ObjectId>} res - Response to client.
 
  */
 

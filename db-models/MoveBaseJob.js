@@ -7,6 +7,11 @@ const JobSchema = require('./IJob');
  * @module MoveBaseJob
  */
 
+/**
+ * @name module:MoveBaseJob
+ * @type {Object}
+ */
+
 const Base = require('./IJob'); // we have to make sure our Book schema is aware of the Base schema
 
 /**

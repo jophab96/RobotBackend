@@ -12,9 +12,9 @@ const dataBaseManager = new DBManager();
 
 
 /** @function formatWorkflows
- * Method to format a list of workflows.
- * @param {List<workflow>} workflows - list of workflows
- * @return {List<workflow>} wf_list - formated list of workflows
+ * @description Method to format a list of workflows.
+ * @param {List<Workflow>} workflows - list of workflows
+ * @return {List<Workflow>} wf_list - formated list of workflows
  */
 
 function formatWorkflows(workflows) {
@@ -31,9 +31,9 @@ function formatWorkflows(workflows) {
 }
 
 /** @function /findOneJob (POST)
- * API Call to find one job.
+ * @description API Call to find one job.
  * @param {Request} req - Input from Frontend which includes job id.
- * @param {Response} res -
+ * @param {Response} res - Response to client which includes the job
 
  */
 
@@ -44,7 +44,12 @@ router.post('/findOneJob', async function (req, res) {
 
 });
 
+/** @function /readOne (POST)
+ * @description API Call to find one workflow.
+ * @param {Request<mongoose.Types.ObjectId>} req - Input from Frontend which includes job id.
+ * @param {Response<Workflow>} res - Response to client which includes the workflow
 
+ */
 router.post('/readOne', async function (req, res) {
 
     //Get Workflow out of DB (Key : wf:id)
@@ -60,9 +65,9 @@ router.post('/readOne', async function (req, res) {
 });
 
 /** @function /readAll (POST)
- * API Call to return all workflows
+ * @description API Call to return all workflows
  * @param {Request} req - Input from client
- * @param {Response<workflow>} res - Response which inclues a list of workflows
+ * @param {Response<Workflow[]>} res - Response which inclues a list of workflows
 
  */
 
@@ -80,9 +85,9 @@ router.post('/readAll', async function (req, res ) {
 });
 
 /** @function /readOneJob (POST)
- * API Call to return one specific job
- * @param {Request<jobID>} req - Input from client which includes job id
- * @param {Response<job>} res - Response which inclues the requested job
+ * @description API Call to return one specific job
+ * @param {Request<mongoose.Types.ObjectId>} req - Input from client which includes job id
+ * @param {Response<Job>} res - Response which inclues the requested job
 
 
  */

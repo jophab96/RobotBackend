@@ -1,0 +1,16 @@
+{
+  "extension": {
+    "title": "Implementation of new methods",
+  "children": {
+    "databaseTutorial": {
+      "title": "Extending the Database"
+    },
+    "DBManagerTutorial": {
+      "title": "Extending the DBManager"
+    },
+    "ChimeraManagerTutorial": {
+      "title": "Extending the ChimeraManager"
+    }
+  }
+}
+}

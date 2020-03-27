@@ -1,5 +1,7 @@
 var HTTPManager = require('../modules/HTTPManager').HTTPManager;
 var CONFIG = require('../config/routingConfig');
+var NAMING = require('../config/namingConfig');
+
 
 var GRIPPER_GRIP_NAME = 'GripperGrip';
 var GRIPPER_RELEASE_NAME = 'GripperRelease';
@@ -49,12 +51,38 @@ class ChimeraManager {
     }
 
     /**
+     * gets the workflow to play
+     * @return {Workflow} workflow
+     */
+    /**
+     * @typedef Workflow
+     * @type {Any}
+     * @property {mongoose.Types.ObjectId} _id - unique ID of the workflow
+     * @property {String} name - name of the workflow
+     * @property {Date} created_at- creation date of the workflow
+     * @property {Job[]} jobs - array of jobs
+
+     */
+
+    /**
+     * @typedef Job
+     * @type {Any}
+     * @property {mongoose.Types.ObjectId} _id - unique ID of the job
+     * @property {Number} activationTimeout - global job param
+
+     */
+
+    getWorkflow(){
+
+        return this.worklfow;
+    }
+
+    /**
      * Executes the workflow which was set by the {@link ChimeraManager#setWorkflow|setWorkflow} Method.
      * Each job of the workflow is executed by the {@link ChimeraManager#executeJob|executeJob} Method.
      * @param {none} none
 
      */
-
 
     executeWorkflow() {
         if (x < this.worklfow.length) {
@@ -120,9 +148,7 @@ class ChimeraManager {
         return new Promise(checkCondition);
     }
 
-
     async getAvailableJobs() {
-
 
         var availableJobs = {
             'workflows': ['GripperGripWorkflow',
@@ -131,33 +157,83 @@ class ChimeraManager {
             'NewMethodWorkflow']
         };
 
-        //this.availabeJobs = await httpManager.pullJobs();
-        //delete this.availabeJobs[2];
         console.log(availableJobs);
         return availableJobs;
-
-
-        //return await httpManager.pullJobs();
     }
 
-//Mocks Arm Position
-    async getArmPosition() {
+    /**
+     * @typedef Position
+     * @type {Number[]}
+     * @property {Number} x - x value
+     * @property {Number} y - y value
+     * @property {Number} z - z value
+     * @property {Number} x - x value
+     * @property {Number} y - y value
+     * @property {Number} z - z value
+     * @property {Number} w - w value
+     */
+    /**
+     * Mock and returns the actual arm position
+     * @return {Position} basePosition
+     */
+     getArmPosition() {
 
         var armPosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return armPosition;
     }
 
-//Mocks Base Position
-    async getBasePosition() {
+    /**
+     * Sets the actual arm position
+     * @param {Position} armPosition
+     */
+    setArmPosition(armPosition){
+
+         this.armPosition = armPosition
+    }
+
+    /**
+     * Mock and returns the actual base position
+     * @return {Position} basePosition
+     */
+     getBasePosition() {
 
         var basePosition = [this.num(), this.num(), this.num(), this.num(), this.num(), this.num(), this.num()];
         return basePosition;
     }
 
+    /**
+     * Sets the actual arm position
+     * @param {Position} armPosition
+     */
+    setBasePosition(basePosition){
+
+        this.basePosition = basePosition
+    }
+
+    /**
+     * Gets the workflowProgress
+     * @return {Number} workflowProgress
+     */
+
     getWorkflowProgress() {
 
-        return workflowProgress;
+        return this.workflowProgress;
     }
+
+    /**
+     * Sets the workflowProgress
+     * @param {Number} workflowProgress
+     */
+
+    setWorkflowProgress(workflowProgress){
+
+        this.workflowProgress = workflowProgress;
+    }
+
+    /**
+     * Generates a random number for position mocking
+     * @return {Number} randomNumber
+     */
 
     num() {
 
@@ -165,6 +241,12 @@ class ChimeraManager {
 
     }
 
+    /**
+     * Generates the RPC request string for each single job.
+     * You have to change this if you want to extend the application.
+     * @param {Job} job
+     * @return {String} preparedRequest
+     */
     prepareJob(job) {
 
         var preparedRequest = {
@@ -175,20 +257,24 @@ class ChimeraManager {
         };
 
         switch (job.job_type) {
-            case (GRIPPER_GRIP_NAME):
+            case (NAMING.GRIPPER_GRIP_NAME):
                 var params = [{'activation_timeout': job.activationTimeout}];
                 break;
 
-            case (GRIPPER_RELEASE_NAME):
+            case (NAMING.GRIPPER_RELEASE_NAME):
                 var params = [{'activation_timeout': job.activationTimeout}];
                 break;
 
-            case (MOVE_BASE_NAME):
+            case (NAMING.MOVE_BASE_NAME):
                 var params = [{'activation_timeout': job.activationTimeout, 'goalPose': job.goalPose}];
                 break;
 
-            case (MOVE_ARM_CARTESIAN_NAME):
+            case (NAMING.MOVE_ARM_CARTESIAN_NAME):
                 var params = [{'activation_timeout': job.activationTimeout, 'goalPose': job.goalPose}];
+                break;
+
+            case (NAMING.NEW_METHOD_NAME):
+                var params = [{'activation_timeout': job.activationTimeout}];
                 break;
         }
 
@@ -196,6 +282,11 @@ class ChimeraManager {
         return preparedRequest;
     }
 
+    /**
+     * Generates a sleep promise for x seconds.
+     * @param {Number} ms
+     * @return {Promise} newPromise
+     */
     sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

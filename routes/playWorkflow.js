@@ -15,9 +15,9 @@ let result = new Object();
 
 
 /** @function /playWorkflow (POST)
- * API Call to start a workflow.
- * @param {Request<workflowID>} req - Input from Frontend which includes workflow id.
- * @return {Response<workflowID>} res - Response to client which includes the workflowID of the actual played workflow.
+ * @description API Call to start a workflow.
+ * @param {Request<mongoose.Types.ObjectId>} req - Input from Frontend which includes workflow id.
+ * @return {Response<mongoose.Types.ObjectId>} res - Response to client which includes the workflowID of the actual played workflow.
  */
 
 router.post('/', async function (req, res) {
@@ -34,10 +34,10 @@ router.post('/', async function (req, res) {
     res.send(result);
 });
 
-/** @function /playWorkflow (POST)
- * API Call to check the progress of the actual processed workflow.
+/** @function /workflowProgress (POST)
+ * @description API Call to check the progress of the actual processed workflow.
  * @param {Request} req - Input from Client .
- * @return {Response<Progress>} res - Response to client which includes the progress of the actual played workflow.
+ * @return {Response<Number>} res - Response to client which includes the progress of the actual played workflow.
 
  */router.post('/workflowProgress', async function (req, res) {
 
