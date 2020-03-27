@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/readWorkflow.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/readWorkflow.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var express = require('express');
+var router = express.Router();
+
+var DBManager = require('../modules/DBManager').DBManager;
+
+
+const dataBaseManager = new DBManager();
+
+
+/** @module readWorkflow */
+
+
+
+/** @function formatWorkflows
+ * @description Method to format a list of workflows.
+ * @param {List&lt;Workflow>} workflows - list of workflows
+ * @return {List&lt;Workflow>} wf_list - formated list of workflows
+ */
+
+function formatWorkflows(workflows) {
+
+    var wf_list = [];
+
+    for (let workflow of workflows) {
+
+        var wf = {_id: workflow._id, _name: workflow.name, _created_at: workflow.created_at};
+        wf_list.push(wf);
+    }
+
+    return wf_list;
+}
+
+/** @function /findOneJob (POST)
+ * @description API Call to find one job.
+ * @param {Request} req - Input from Frontend which includes job id.
+ * @param {Response} res - Response to client which includes the job
+
+ */
+
+router.post('/findOneJob', async function (req, res) {
+
+    res.send(await dataBaseManager.findOneJob());
+
+
+});
+
+/** @function /readOne (POST)
+ * @description API Call to find one workflow.
+ * @param {Request&lt;mongoose.Types.ObjectId>} req - Input from Frontend which includes job id.
+ * @param {Response&lt;Workflow>} res - Response to client which includes the workflow
+
+ */
+router.post('/readOne', async function (req, res) {
+
+    //Get Workflow out of DB (Key : wf:id)
+    let workflow = await dataBaseManager.findOneMappedWorkflow(req.body.wf_id);
+    //Get Job Details out ob DB (with Jobs FK of WF)
+    let detailedJobs = await dataBaseManager.createJobList(workflow._jobsObjects);
+    //Push Job Details into Workflow
+    workflow._jobsObjects = detailedJobs;
+
+    res.send(workflow);
+
+
+});
+
+/** @function /readAll (POST)
+ * @description API Call to return all workflows
+ * @param {Request} req - Input from client
+ * @param {Response&lt;Workflow[]>} res - Response which inclues a list of workflows
+
+ */
+
+router.post('/readAll', async function (req, res ) {
+
+
+    //Grab all WFs out of DB
+    let workflows = await dataBaseManager.findAllWorkflows();
+    //Format Workflows
+    let formatedWorkflows = formatWorkflows(workflows);
+    //Send Result
+    res.send(formatedWorkflows);
+
+
+});
+
+/** @function /readOneJob (POST)
+ * @description API Call to return one specific job
+ * @param {Request&lt;mongoose.Types.ObjectId>} req - Input from client which includes job id
+ * @param {Response&lt;Job>} res - Response which inclues the requested job
+
+
+ */
+
+router.post('/readOneJob', async function (req, res) {
+
+    //Grab one Job out of DB
+    let job = await dataBaseManager.findOneJob(req.body.job_id);
+    //Send Result
+    res.send(job);
+
+
+});
+
+
+
+router.post('/', async function (req, res, next) {
+
+    //Grab one Job out of DB
+    let playList = await dataBaseManager.createPlayList(req.body.wf_id);
+    //Send Result
+    res.send(playList);
+
+
+});
+
+
+module.exports = router;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-createWorkflow.html">createWorkflow</a></li><li><a href="module-deleteWorkflow.html">deleteWorkflow</a></li><li><a href="module-GripperGripJob.html">GripperGripJob</a></li><li><a href="module-GripperReleaseJob.html">GripperReleaseJob</a></li><li><a href="module-IJob.html">IJob</a></li><li><a href="module-MoveArmCartesianJob.html">MoveArmCartesianJob</a></li><li><a href="module-MoveBaseJob.html">MoveBaseJob</a></li><li><a href="module-NewMethodJob.html">NewMethodJob</a></li><li><a href="module-playWorkflow.html">playWorkflow</a></li><li><a href="module-readWorkflow.html">readWorkflow</a></li><li><a href="module-RobotDataService.html">RobotDataService</a></li><li><a href="module-socketApi.html">socketApi</a></li><li><a href="module-updateWorkflow.html">updateWorkflow</a></li></ul><h3>Classes</h3><ul><li><a href="ChimeraManager.html">ChimeraManager</a></li><li><a href="DBManager.html">DBManager</a></li><li><a href="HTTPManager.html">HTTPManager</a></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-extension.html">Implementation of new methods</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Mar 27 2020 11:36:28 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
