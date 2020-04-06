@@ -26,7 +26,7 @@ router.post('/', async function (req, res) {
 
     inputWorkflow = req.body.jsondata;
     dataBaseManager.open();
-    processingWorkflowID =dataBaseManager.createWorkflow(inputWorkflow._name);
+    processingWorkflowID = dataBaseManager.createWorkflow(inputWorkflow._name);
     dataBaseManager.addJobs(inputWorkflow._jobsObjects);
     dataBaseManager.close();
     res.send(processingWorkflowID);

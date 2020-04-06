@@ -8,6 +8,8 @@ const Job_GripperGrip = require('../db-models/GripperGripJob');
 const Job_GripperRelease = require('../db-models/GripperReleaseJob');
 const Job_MoveBase = require('../db-models/MoveBaseJob');
 const Job_MoveArmCartesian = require('../db-models/MoveArmCartesianJob');
+
+/** Insert require for extending new method.**/
 const Job_NewMethod = require('../db-models/NewMethodJob');
 
 
@@ -84,6 +86,7 @@ class DBManager {
                     };
                     j.push(listjob);
                     break;
+                /** Insert case for extending new method.**/
 
                 case (NAMING.NEW_METHOD_NAME):
                     var listjob = {
@@ -342,6 +345,7 @@ class DBManager {
 
                     });
                     break;
+                /** Insert case for extending new method.**/
                 case (NAMING.NEW_METHOD_NAME):
                     processingJob = new Job_NewMethod({
                         _id: new mongoose.Types.ObjectId(),

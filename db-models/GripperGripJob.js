@@ -9,7 +9,7 @@ const JobSchema = require('./IJob');
 
 
 
-const Base = require('./IJob'); // we have to make sure our Book schema is aware of the Base schema
+const Base = require('./IJob');
 
 
 /**

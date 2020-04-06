@@ -3,11 +3,6 @@ var CONFIG = require('../config/routingConfig');
 var NAMING = require('../config/namingConfig');
 
 
-var GRIPPER_GRIP_NAME = 'GripperGrip';
-var GRIPPER_RELEASE_NAME = 'GripperRelease';
-var MOVE_BASE_NAME = 'BaseMove';
-var MOVE_ARM_CARTESIAN_NAME = 'ArmCartesian';
-
 var JOB_STATE_ACTIVE = 'active';
 
 var workflowProgress = 0;

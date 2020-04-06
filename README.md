@@ -14,6 +14,9 @@ The web application is based on the "MEAN" Stack and stands for
 For the documentation of the "Back-End" [JSDoc](https://jsdoc.app/) was used.     
 JSDoc is a documentation tool for JavaScript applications. Basically it generates a static documentation for the application. 
 
+To generate / update the documentation, please run the follofing command:
+
+jsdoc -u ./tutorial/ -c ./JSDocConfig.json  --readme ./README.md
 
 For this application the documentation was extended. Under [Tutorials](../out/tutorial-extension.html) you will find detailed instructions for adding new robot methods. 
 
