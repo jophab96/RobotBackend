@@ -17,7 +17,7 @@
     "mongoose": "^5.9.7",
     "mongoose-extend-schema": "^1.0.0",
     "morgan": "~1.9.1",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
     "webworker-threads": "^0.7.17"
