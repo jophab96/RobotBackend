@@ -19,7 +19,7 @@
     "morgan": "~1.9.1",
     "pug": "^2.0.4",
     "request": "^2.88.2",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "webworker-threads": "^0.7.17"
   },
   "devDependencies": {
